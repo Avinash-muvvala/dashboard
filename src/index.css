@@ -124,3 +124,11 @@ svg {
     transition-duration: 0.01ms !important;
   }
 }
+
+.nl-wrap{
+    display: none !important;
+
+}
+.nl-badge-brand {
+  display: none !important;
+}
