@@ -1,0 +1,1 @@
+export { topicGuides } from './weeks/index';

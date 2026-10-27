@@ -1,0 +1,44 @@
+.company-pdf-page {
+  max-width: 100%;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 12px 32px rgba(24, 56, 43, 0.16);
+  animation: company-page-enter 180ms ease-out both;
+}
+
+.company-pdf-page .react-pdf__Page__canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.company-pdf-page .textLayer,
+.company-pdf-page .annotationLayer {
+  max-width: 100%;
+}
+
+@keyframes company-page-enter {
+  from {
+    opacity: 0.72;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .company-pdf-page {
+    border-radius: 2px;
+    box-shadow: 0 6px 18px rgba(24, 56, 43, 0.14);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .company-pdf-page {
+    animation: none;
+  }
+}
