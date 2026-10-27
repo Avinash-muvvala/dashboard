@@ -21,6 +21,14 @@ const ERRORS: Record<string, string> = {
   "auth/invalid-email": "Enter a valid email address.",
   "auth/too-many-requests": "Too many attempts. Wait a minute and try again.",
   "auth/popup-closed-by-user": "Google sign-in was closed before finishing.",
+  "auth/unauthorized-domain":
+    "This site is not authorized for sign-in. Add your Netlify domain in Firebase Console > Authentication > Settings > Authorized domains.",
+  "auth/operation-not-allowed":
+    "Google sign-in is disabled for this Firebase project. Enable the Google provider in Firebase Console > Authentication > Sign-in method.",
+  "auth/popup-blocked":
+    "Your browser blocked the Google sign-in popup. Allow popups for this site and try again.",
+  "auth/network-request-failed":
+    "A network error interrupted Google sign-in. Check your connection and try again.",
 };
 
 const CODE_LINES = [
@@ -94,13 +102,25 @@ const AuthPage = () => {
     setLoading(true);
     try {
       const result = await signInWithPopup(auth, new GoogleAuthProvider());
-      await createUserDoc(
-        result.user.uid,
-        result.user.displayName || "User",
-        result.user.email || "",
-      );
+      try {
+        await createUserDoc(
+          result.user.uid,
+          result.user.displayName || "User",
+          result.user.email || "",
+        );
+      } catch (profileError) {
+        console.error(
+          "Google sign-in succeeded, but profile setup failed:",
+          profileError,
+        );
+        setError(
+          "Google sign-in succeeded, but your profile could not be saved. Check your Firestore rules and App Check settings.",
+        );
+        return;
+      }
       navigate("/");
     } catch (err) {
+      console.error("Google authentication failed:", err);
       setError(friendly(err, "Google sign-in failed. Please try again."));
     } finally {
       setLoading(false);
