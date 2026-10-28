@@ -22,6 +22,8 @@ export interface QuestionItem {
   explanation: string;
   inputs: string;
   expectedOutput?: string;
+  pattern?: string;
+  hint?: string;
 }
 
 export const javaQuestions: Record<DayType, QuestionItem[]> = {

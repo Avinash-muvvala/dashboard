@@ -33,6 +33,7 @@ import {
   javaQuestions,
   type QuestionItem,
 } from "./JavaQuestions/JavaQuestions";
+import { javaStreamsQuestions } from "../pages/JavaQuestions/javaStreamsPractice";
 import { pythonQuestions } from "../pages/Python/PythonQuestions";
 import { useNavigate } from "react-router-dom";
 import { javaScriptQuestions } from "../pages/Java Scrpit/JavaScrpitQuestions";
@@ -51,6 +52,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import type { DayType } from "./Constants/DayType";
 
 type LanguageType = "Java" | "Python" | "JavaScript";
+type PracticeDay = DayType | "Java Streams";
 
 const getExpectedOutput = (question: {
   inputs: string;
@@ -263,7 +265,7 @@ const loadPyodideRuntime = (): Promise<PyodideRuntime> => {
 
 interface Submission {
   language: LanguageType;
-  day: DayType;
+  day: PracticeDay;
   taskIndex: number;
   code: string;
   timestamp: string;
@@ -272,7 +274,7 @@ interface Submission {
 
 interface CompletedTask {
   language: LanguageType;
-  day: DayType;
+  day: PracticeDay;
   taskIndex: number;
   submissions: Submission[];
 }
@@ -311,12 +313,13 @@ type DashboardStorage = {
   selectedLanguage?: LanguageType;
   selectedDay?: DayType;
   selectedDifficulty?: DifficultyType | null;
+  isStreamsMode?: boolean;
   drafts?: Record<string, string>;
 };
 
 type CompilerSession = {
   language: LanguageType;
-  day: DayType;
+  day: PracticeDay;
   taskIndex: number;
   code: string;
 };
@@ -371,7 +374,9 @@ const Dashboard = () => {
   const [selectedDay, setSelectedDay] = useState<DayType>(() => {
     const session = readCompilerSession();
     const saved = readDashboardStorage().selectedDay;
-    return session && days.includes(session.day)
+    return session &&
+      session.day !== "Java Streams" &&
+      days.includes(session.day)
       ? session.day
       : saved && days.includes(saved)
         ? saved
@@ -387,6 +392,11 @@ const Dashboard = () => {
       () => readDashboardStorage().selectedDifficulty ?? null,
     );
   const [isRevisionMode, setIsRevisionMode] = useState(false);
+  const [isStreamsMode, setIsStreamsMode] = useState(
+    () =>
+      readCompilerSession()?.day === "Java Streams" ||
+      readDashboardStorage().isStreamsMode === true,
+  );
 
   const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>(
     cachedTasks ?? [], // use cache if available
@@ -411,11 +421,12 @@ const Dashboard = () => {
   const [currentQuestion, setCurrentQuestion] = useState<QuestionItem | string>(
     () => {
       const session = readCompilerSession();
-      return session
-        ? (questionsByLanguage[session.language][session.day][
+      if (!session) return "";
+      return session.day === "Java Streams"
+        ? (javaStreamsQuestions[session.taskIndex] ?? "")
+        : (questionsByLanguage[session.language][session.day][
             session.taskIndex
-          ] ?? "")
-        : "";
+          ] ?? "");
     },
   );
   const [historySubmissions, setHistorySubmissions] = useState<Submission[]>(
@@ -426,6 +437,9 @@ const Dashboard = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] =
     useState<SubmissionStatus | null>(null);
+  const currentPracticeDay: PracticeDay = isStreamsMode
+    ? "Java Streams"
+    : selectedDay;
 
   useEffect(() => {
     if (!openSubmissionDialog || currentTaskIndex === null) return;
@@ -435,7 +449,7 @@ const Dashboard = () => {
         "codeMasteryCompilerSession",
         JSON.stringify({
           language: selectedLanguage,
-          day: selectedDay,
+          day: currentPracticeDay,
           taskIndex: currentTaskIndex,
           code: submissionCode,
         } satisfies CompilerSession),
@@ -447,7 +461,7 @@ const Dashboard = () => {
     openSubmissionDialog,
     currentTaskIndex,
     selectedLanguage,
-    selectedDay,
+    currentPracticeDay,
     submissionCode,
   ]);
 
@@ -456,7 +470,7 @@ const Dashboard = () => {
     const draftKey =
       currentTaskIndex === null
         ? null
-        : `${selectedLanguage}_${selectedDay}_${currentTaskIndex}`;
+        : `${selectedLanguage}_${currentPracticeDay}_${currentTaskIndex}`;
 
     try {
       localStorage.setItem(
@@ -466,6 +480,7 @@ const Dashboard = () => {
           selectedLanguage,
           selectedDay,
           selectedDifficulty,
+          isStreamsMode,
           drafts: {
             ...saved.drafts,
             ...(draftKey ? { [draftKey]: submissionCode } : {}),
@@ -478,7 +493,9 @@ const Dashboard = () => {
   }, [
     selectedLanguage,
     selectedDay,
+    currentPracticeDay,
     selectedDifficulty,
+    isStreamsMode,
     currentTaskIndex,
     submissionCode,
   ]);
@@ -585,15 +602,17 @@ const Dashboard = () => {
     () =>
       isRevisionMode && selectedLanguage === "Java"
         ? Object.values(javaQuestions).flat()
-        : questionsByLanguage[selectedLanguage][selectedDay],
-    [isRevisionMode, selectedLanguage, selectedDay],
+        : isStreamsMode
+          ? javaStreamsQuestions
+          : questionsByLanguage[selectedLanguage][selectedDay],
+    [isRevisionMode, isStreamsMode, selectedLanguage, selectedDay],
   );
 
   const isTaskCompleted = (taskIndex: number) => {
     return completedTasks.some(
       (task) =>
         task.language === selectedLanguage &&
-        task.day === selectedDay && // 👈 add this
+        task.day === currentPracticeDay &&
         task.taskIndex === taskIndex &&
         task.submissions.length > 0,
     );
@@ -854,7 +873,7 @@ sys.stderr = sys.__stderr__
 
       const newSubmission: Submission = {
         language: selectedLanguage,
-        day: selectedDay,
+        day: currentPracticeDay,
         taskIndex: currentTaskIndex,
         code: submissionCode,
         timestamp: new Date().toLocaleString(),
@@ -874,7 +893,7 @@ sys.stderr = sys.__stderr__
         const existing = prev.find(
           (task) =>
             task.language === selectedLanguage &&
-            task.day === selectedDay &&
+            task.day === currentPracticeDay &&
             task.taskIndex === currentTaskIndex,
         );
 
@@ -888,7 +907,7 @@ sys.stderr = sys.__stderr__
               ...prev,
               {
                 language: selectedLanguage,
-                day: selectedDay,
+                day: currentPracticeDay,
                 taskIndex: currentTaskIndex,
                 submissions: [newSubmission],
               },
@@ -916,7 +935,7 @@ sys.stderr = sys.__stderr__
     const task = completedTasks.find(
       (t) =>
         t.language === selectedLanguage &&
-        t.day === selectedDay && // 👈 add this
+        t.day === currentPracticeDay &&
         t.taskIndex === taskIndex,
     );
     setHistorySubmissions(task?.submissions || []);
@@ -1313,6 +1332,7 @@ sys.stderr = sys.__stderr__
                       setSelectedLanguage(language);
                       setSelectedDay("Day 1");
                       setIsRevisionMode(false);
+                      setIsStreamsMode(false);
                     }}
                     sx={{
                       cursor: "pointer",
@@ -1924,6 +1944,7 @@ sys.stderr = sys.__stderr__
                   label={diff}
                   onClick={() => {
                     setIsRevisionMode(false);
+                    setIsStreamsMode(false);
                     const nextDifficulty =
                       selectedDifficulty === diff ? null : diff;
                     setSelectedDifficulty(nextDifficulty);
@@ -1948,13 +1969,39 @@ sys.stderr = sys.__stderr__
                   }}
                 />
               ))}
+              {selectedLanguage === "Java" && (
+                <Chip
+                  label="Java Streams"
+                  icon={<CodeIcon />}
+                  onClick={() => {
+                    setIsRevisionMode(false);
+                    setIsStreamsMode(false);
+                    try {
+                      localStorage.setItem(
+                        dashboardStorageKey,
+                        JSON.stringify({
+                          ...readDashboardStorage(),
+                          isStreamsMode: false,
+                        }),
+                      );
+                    } catch {
+                      // Ignore storage errors while opening practice.
+                    }
+                    navigate("/java-streams-practice");
+                  }}
+                  variant="outlined"
+                  sx={{ fontWeight: 700, cursor: "pointer", height: 32 }}
+                />
+              )}
             </Box>
 
             {/* ✅ Use Box with flexWrap + gap instead of Stack */}
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {(selectedDifficulty
-                ? difficultyDays[selectedDifficulty]
-                : days
+              {(isStreamsMode
+                ? []
+                : selectedDifficulty
+                  ? difficultyDays[selectedDifficulty]
+                  : days
               ).map((day) => (
                 <Chip
                   key={day}
@@ -1989,7 +2036,7 @@ sys.stderr = sys.__stderr__
                   }}
                 />
               ))}
-              {selectedLanguage === "Java" && (
+              {selectedLanguage === "Java" && !isStreamsMode && (
                 <Chip
                   label="Revision"
                   onClick={() => setIsRevisionMode(true)}
@@ -2006,6 +2053,19 @@ sys.stderr = sys.__stderr__
               )}
             </Box>
 
+            {isStreamsMode && (
+              <Button
+                component="a"
+                href="/pdfs/java-streams-pattern-playbook.pdf"
+                target="_blank"
+                rel="noreferrer"
+                variant="outlined"
+                sx={{ mt: 2 }}
+              >
+                Open Streams pattern playbook
+              </Button>
+            )}
+
             {/* Progress */}
             <Box sx={{ mt: 3 }}>
               <Box
@@ -2015,7 +2075,7 @@ sys.stderr = sys.__stderr__
                   variant="body2"
                   sx={{ fontWeight: 600, color: "text.secondary" }}
                 >
-                  Today's Progress
+                  {isStreamsMode ? "Java Streams Progress" : "Today's Progress"}
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 700 }}>
                   {tasks.filter((_, i) => isTaskCompleted(i)).length}/
@@ -2079,7 +2139,7 @@ sys.stderr = sys.__stderr__
                         }}
                       >
                         <Chip
-                          label={`${isRevisionMode ? "Revision" : selectedDay} - Q${index + 1}`}
+                          label={`${isStreamsMode ? "Java Streams" : isRevisionMode ? "Revision" : selectedDay} - Q${index + 1}`}
                           size="small"
                           sx={{
                             backgroundColor: languageColors[selectedLanguage],
@@ -2103,6 +2163,28 @@ sys.stderr = sys.__stderr__
                           ? question.question
                           : question}
                       </Typography>
+                      {typeof question === "object" && question.pattern && (
+                        <Chip
+                          label={question.pattern}
+                          size="small"
+                          variant="outlined"
+                          sx={{ mt: 1 }}
+                        />
+                      )}
+                      {typeof question === "object" && question.hint && (
+                        <details style={{ marginTop: 12 }}>
+                          <summary style={{ cursor: "pointer" }}>
+                            Show hint
+                          </summary>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mt: 0.75 }}
+                          >
+                            {question.hint}
+                          </Typography>
+                        </details>
+                      )}
                       {typeof question === "object" && question.explanation && (
                         <Typography
                           variant="body2"
@@ -2255,7 +2337,7 @@ sys.stderr = sys.__stderr__
                         >
                           Code Now
                         </Button>
-                        {!isRevisionMode && (
+                        {!isRevisionMode && !isStreamsMode && (
                           <Button
                             fullWidth
                             variant="outlined"
@@ -2278,18 +2360,20 @@ sys.stderr = sys.__stderr__
                             Solution
                           </Button>
                         )}
-                        <Button
-                          fullWidth
-                          variant="outlined"
-                          sx={{
-                            flex: { xs: "1 1 100%", sm: 1 },
-                            minWidth: { xs: "100%", sm: 100 },
-                            fontSize: { xs: "0.78rem", sm: "0.82rem" },
-                          }}
-                          onClick={(e) => youtubeExplain(e, index)}
-                        >
-                          Explanation
-                        </Button>
+                        {!isStreamsMode && (
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            sx={{
+                              flex: { xs: "1 1 100%", sm: 1 },
+                              minWidth: { xs: "100%", sm: 100 },
+                              fontSize: { xs: "0.78rem", sm: "0.82rem" },
+                            }}
+                            onClick={(e) => youtubeExplain(e, index)}
+                          >
+                            Explanation
+                          </Button>
+                        )}
                       </Stack>
                       {isTaskCompleted(index) && (
                         <Button
