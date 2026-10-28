@@ -20,7 +20,16 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import Editor from "@monaco-editor/react";
 import { useNavigate } from "react-router-dom";
-import { javaStreamsQuestions } from "./javaStreamsPractice";
+import {
+  javaStreamsQuestions,
+  type JavaStreamsDifficulty,
+} from "./javaStreamsPractice";
+
+const difficultyColors: Record<JavaStreamsDifficulty, string> = {
+  Easy: "#2e7d32",
+  Medium: "#e65100",
+  Hard: "#c62828",
+};
 
 const solvedStorageKey = "javaStreamsPracticeSolved";
 const draftsStorageKey = "javaStreamsPracticeDrafts";
@@ -208,6 +217,9 @@ const executeJava = async (code: string) => {
 const JavaStreamsPracticePage = () => {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState(1);
+  const [difficultyFilter, setDifficultyFilter] = useState<
+    JavaStreamsDifficulty | "All"
+  >("All");
   const [patternFilter, setPatternFilter] = useState("All patterns");
   const [unsolvedOnly, setUnsolvedOnly] = useState(false);
   const [drafts, setDrafts] = useState<Record<number, string>>(readDrafts);
@@ -236,6 +248,7 @@ const JavaStreamsPracticePage = () => {
   );
   const visibleQuestions = javaStreamsQuestions.filter(
     (item) =>
+      (difficultyFilter === "All" || item.difficulty === difficultyFilter) &&
       (patternFilter === "All patterns" || item.pattern === patternFilter) &&
       (!unsolvedOnly || !solved.includes(item.id) || item.id === selectedId),
   );
@@ -248,6 +261,19 @@ const JavaStreamsPracticePage = () => {
     setVerdict(null);
     setShowHint(false);
     setShowAnswer(false);
+  };
+
+  const changeDifficultyFilter = (
+    nextDifficulty: JavaStreamsDifficulty | "All",
+  ) => {
+    setDifficultyFilter(nextDifficulty);
+    const nextQuestion = javaStreamsQuestions.find(
+      (item) =>
+        (nextDifficulty === "All" || item.difficulty === nextDifficulty) &&
+        (patternFilter === "All patterns" || item.pattern === patternFilter) &&
+        (!unsolvedOnly || !solved.includes(item.id) || item.id === selectedId),
+    );
+    if (nextQuestion) selectQuestion(nextQuestion.id);
   };
 
   const goToNext = () => {
@@ -392,6 +418,40 @@ const JavaStreamsPracticePage = () => {
               value={(solved.length / javaStreamsQuestions.length) * 100}
               sx={{ height: 8, borderRadius: 4, mb: 2 }}
             />
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, mb: 1.5 }}>
+              {(["All", "Easy", "Medium", "Hard"] as const).map(
+                (difficulty) => {
+                  const color =
+                    difficulty === "All"
+                      ? "#1565c0"
+                      : difficultyColors[difficulty];
+                  const active = difficultyFilter === difficulty;
+                  const count =
+                    difficulty === "All"
+                      ? javaStreamsQuestions.length
+                      : javaStreamsQuestions.filter(
+                          (item) => item.difficulty === difficulty,
+                        ).length;
+                  return (
+                    <Chip
+                      key={difficulty}
+                      label={`${difficulty} (${count})`}
+                      onClick={() => changeDifficultyFilter(difficulty)}
+                      variant={active ? "filled" : "outlined"}
+                      sx={{
+                        fontWeight: 700,
+                        borderColor: color,
+                        color: active ? "#fff" : color,
+                        backgroundColor: active ? color : "transparent",
+                        "&:hover": {
+                          backgroundColor: active ? color : `${color}14`,
+                        },
+                      }}
+                    />
+                  );
+                },
+              )}
+            </Box>
             <TextField
               select
               size="small"
@@ -464,6 +524,17 @@ const JavaStreamsPracticePage = () => {
                     )}
                   </Box>
                   <Chip
+                    label={item.difficulty}
+                    size="small"
+                    sx={{
+                      mt: 0.75,
+                      mr: 0.5,
+                      backgroundColor: difficultyColors[item.difficulty],
+                      color: "#fff",
+                      fontWeight: 700,
+                    }}
+                  />
+                  <Chip
                     label={item.pattern}
                     size="small"
                     variant="outlined"
@@ -489,6 +560,15 @@ const JavaStreamsPracticePage = () => {
               <Typography variant="h6" sx={{ fontWeight: 800, flex: 1 }}>
                 Question {question.id}
               </Typography>
+              <Chip
+                label={question.difficulty}
+                size="small"
+                sx={{
+                  backgroundColor: difficultyColors[question.difficulty],
+                  color: "#fff",
+                  fontWeight: 700,
+                }}
+              />
               <Chip label={question.pattern} size="small" color="primary" />
             </Box>
             <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.65 }}>

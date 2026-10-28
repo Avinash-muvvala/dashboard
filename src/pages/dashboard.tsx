@@ -2157,235 +2157,258 @@ sys.stderr = sys.__stderr__
                       {/* Render Question Title */}
                       <Typography
                         variant="subtitle1"
-                        sx={{ fontWeight: "bold" }}
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: "1rem",
+                          lineHeight: 1.5,
+                        }}
                       >
                         {typeof question === "object"
                           ? question.question
                           : question}
                       </Typography>
-                      {typeof question === "object" && question.pattern && (
-                        <Chip
-                          label={question.pattern}
-                          size="small"
-                          variant="outlined"
-                          sx={{ mt: 1 }}
-                        />
-                      )}
-                      {typeof question === "object" && question.hint && (
-                        <details style={{ marginTop: 12 }}>
-                          <summary style={{ cursor: "pointer" }}>
-                            Show hint
-                          </summary>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 0.75 }}
-                          >
-                            {question.hint}
-                          </Typography>
-                        </details>
-                      )}
-                      {typeof question === "object" && question.explanation && (
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ mt: 0.5, lineHeight: 1.4 }}
-                        >
-                          {question.explanation}
-                        </Typography>
-                      )}
-                      {/* Added Input Display Section */}
-                      {typeof question === "object" && question.inputs && (
-                        <Box
-                          sx={{
-                            mt: 1.5,
-                            p: 1,
-                            borderRadius: 1.5,
-                            backgroundColor: "#f8f9fa",
-                            border: "1px dashed rgba(0,0,0,0.12)",
-                          }}
-                        >
-                          <Typography>Sample Inputs:</Typography>
-                          <Typography
-                            variant="body2"
-                            color="text.primary"
-                            sx={{
-                              fontFamily: "monospace",
-                              wordBreak: "break-all",
-                            }}
-                          >
-                            {question.inputs}
-                          </Typography>
-                        </Box>
-                      )}
-                      {typeof question === "object" && question.inputs && (
-                        <Box
-                          sx={{
-                            mt: 1,
-                            p: 1,
-                            borderRadius: 1.5,
-                            backgroundColor: "#f1f8ff",
-                            border: "1px dashed rgba(25, 118, 210, 0.24)",
-                          }}
-                        >
-                          <Typography>Expected Output:</Typography>
-                          <Typography
-                            variant="body2"
-                            color="text.primary"
-                            sx={{
-                              fontFamily: "monospace",
-                              wordBreak: "break-all",
-                            }}
-                          >
-                            {getExpectedOutput(question)}
-                          </Typography>
-                        </Box>
-                      )}
-
-                      {isRevisionMode && typeof question === "object" && (
-                        <Box
-                          sx={{
-                            mt: 1.5,
-                            p: 1.5,
-                            borderRadius: 1.5,
-                            backgroundColor: "#fff8e1",
-                            border: "1px solid #ffe082",
-                          }}
-                        >
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ fontWeight: 800, mb: 0.75 }}
-                          >
-                            Submission History
-                          </Typography>
-                          {(() => {
-                            const submission = getRevisionSubmission(question);
-
-                            return submission ? (
-                              <>
-                                <Typography
-                                  variant="body2"
-                                  sx={{ fontWeight: 700, mb: 0.5 }}
-                                >
-                                  Your latest submitted solution
-                                </Typography>
-                                <Box
-                                  component="pre"
-                                  sx={{
-                                    m: 0,
-                                    p: 1.25,
-                                    backgroundColor: "#1e1e1e",
-                                    color: "#d4d4d4",
-                                    borderRadius: 1,
-                                    overflowX: "auto",
-                                    fontFamily: "monospace",
-                                    fontSize: 12,
-                                    whiteSpace: "pre-wrap",
-                                  }}
-                                >
-                                  {submission.code}
-                                </Box>
-                                <Typography
-                                  variant="caption"
-                                  sx={{
-                                    display: "block",
-                                    mt: 1,
-                                    fontWeight: 700,
-                                  }}
-                                >
-                                  Submitted output
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    fontFamily: "monospace",
-                                    whiteSpace: "pre-wrap",
-                                  }}
-                                >
-                                  {submission.executionOutput}
-                                </Typography>
-                              </>
-                            ) : (
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                              >
-                                No submitted solution yet. Click Code Now to
-                                practice.
-                              </Typography>
-                            );
-                          })()}
-                        </Box>
-                      )}
-
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        sx={{ mt: 2, flexWrap: "wrap" }}
+                      <Box
+                        component="details"
+                        sx={{
+                          mt: 1,
+                          "& > summary": {
+                            cursor: "pointer",
+                            color: "primary.main",
+                            fontSize: "0.875rem",
+                            fontWeight: 700,
+                            py: 0.5,
+                          },
+                        }}
                       >
-                        <Button
-                          fullWidth
-                          variant="contained"
-                          startIcon={<CodeIcon />}
-                          onClick={() => openCompiler(index)}
-                          sx={{
-                            flex: { xs: "1 1 100%", sm: 1 },
-                            minWidth: { xs: "100%", sm: 100 },
-                            fontSize: { xs: "0.78rem", sm: "0.82rem" },
-                            background: `linear-gradient(135deg, ${languageColors[selectedLanguage]}, #00bcd4)`,
-                          }}
+                        <Typography component="summary" variant="body2">
+                          Show details and practice options
+                        </Typography>
+                        {typeof question === "object" && question.pattern && (
+                          <Chip
+                            label={question.pattern}
+                            size="small"
+                            variant="outlined"
+                            sx={{ mt: 1 }}
+                          />
+                        )}
+                        {typeof question === "object" && question.hint && (
+                          <details style={{ marginTop: 12 }}>
+                            <summary style={{ cursor: "pointer" }}>
+                              Show hint
+                            </summary>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ mt: 0.75 }}
+                            >
+                              {question.hint}
+                            </Typography>
+                          </details>
+                        )}
+                        {typeof question === "object" &&
+                          question.explanation && (
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ mt: 0.5, lineHeight: 1.4 }}
+                            >
+                              {question.explanation}
+                            </Typography>
+                          )}
+                        {/* Added Input Display Section */}
+                        {typeof question === "object" && question.inputs && (
+                          <Box
+                            sx={{
+                              mt: 1.5,
+                              p: 1,
+                              borderRadius: 1.5,
+                              backgroundColor: "#f8f9fa",
+                              border: "1px dashed rgba(0,0,0,0.12)",
+                            }}
+                          >
+                            <Typography>Sample Inputs:</Typography>
+                            <Typography
+                              variant="body2"
+                              color="text.primary"
+                              sx={{
+                                fontFamily: "monospace",
+                                wordBreak: "break-all",
+                              }}
+                            >
+                              {question.inputs}
+                            </Typography>
+                          </Box>
+                        )}
+                        {typeof question === "object" && question.inputs && (
+                          <Box
+                            sx={{
+                              mt: 1,
+                              p: 1,
+                              borderRadius: 1.5,
+                              backgroundColor: "#f1f8ff",
+                              border: "1px dashed rgba(25, 118, 210, 0.24)",
+                            }}
+                          >
+                            <Typography>Expected Output:</Typography>
+                            <Typography
+                              variant="body2"
+                              color="text.primary"
+                              sx={{
+                                fontFamily: "monospace",
+                                wordBreak: "break-all",
+                              }}
+                            >
+                              {getExpectedOutput(question)}
+                            </Typography>
+                          </Box>
+                        )}
+
+                        {isRevisionMode && typeof question === "object" && (
+                          <Box
+                            sx={{
+                              mt: 1.5,
+                              p: 1.5,
+                              borderRadius: 1.5,
+                              backgroundColor: "#fff8e1",
+                              border: "1px solid #ffe082",
+                            }}
+                          >
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ fontWeight: 800, mb: 0.75 }}
+                            >
+                              Submission History
+                            </Typography>
+                            {(() => {
+                              const submission =
+                                getRevisionSubmission(question);
+
+                              return submission ? (
+                                <>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{ fontWeight: 700, mb: 0.5 }}
+                                  >
+                                    Your latest submitted solution
+                                  </Typography>
+                                  <Box
+                                    component="pre"
+                                    sx={{
+                                      m: 0,
+                                      p: 1.25,
+                                      backgroundColor: "#1e1e1e",
+                                      color: "#d4d4d4",
+                                      borderRadius: 1,
+                                      overflowX: "auto",
+                                      fontFamily: "monospace",
+                                      fontSize: 12,
+                                      whiteSpace: "pre-wrap",
+                                    }}
+                                  >
+                                    {submission.code}
+                                  </Box>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      display: "block",
+                                      mt: 1,
+                                      fontWeight: 700,
+                                    }}
+                                  >
+                                    Submitted output
+                                  </Typography>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      fontFamily: "monospace",
+                                      whiteSpace: "pre-wrap",
+                                    }}
+                                  >
+                                    {submission.executionOutput}
+                                  </Typography>
+                                </>
+                              ) : (
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  No submitted solution yet. Click Code Now to
+                                  practice.
+                                </Typography>
+                              );
+                            })()}
+                          </Box>
+                        )}
+
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          sx={{ mt: 2, flexWrap: "wrap" }}
                         >
-                          Code Now
-                        </Button>
-                        {!isRevisionMode && !isStreamsMode && (
                           <Button
                             fullWidth
-                            variant="outlined"
-                            startIcon={<LightbulbIcon />}
+                            variant="contained"
+                            startIcon={<CodeIcon />}
+                            onClick={() => openCompiler(index)}
                             sx={{
                               flex: { xs: "1 1 100%", sm: 1 },
                               minWidth: { xs: "100%", sm: 100 },
                               fontSize: { xs: "0.78rem", sm: "0.82rem" },
-                              borderColor:
-                                selectedLanguage === "Java"
-                                  ? languageColors[selectedLanguage]
-                                  : undefined,
-                              color:
-                                selectedLanguage === "Java"
-                                  ? languageColors[selectedLanguage]
-                                  : undefined,
+                              background: `linear-gradient(135deg, ${languageColors[selectedLanguage]}, #00bcd4)`,
                             }}
-                            onClick={() => openSolution(index)}
                           >
-                            Solution
+                            Code Now
                           </Button>
-                        )}
-                        {!isStreamsMode && (
+                          {!isRevisionMode && !isStreamsMode && (
+                            <Button
+                              fullWidth
+                              variant="outlined"
+                              startIcon={<LightbulbIcon />}
+                              sx={{
+                                flex: { xs: "1 1 100%", sm: 1 },
+                                minWidth: { xs: "100%", sm: 100 },
+                                fontSize: { xs: "0.78rem", sm: "0.82rem" },
+                                borderColor:
+                                  selectedLanguage === "Java"
+                                    ? languageColors[selectedLanguage]
+                                    : undefined,
+                                color:
+                                  selectedLanguage === "Java"
+                                    ? languageColors[selectedLanguage]
+                                    : undefined,
+                              }}
+                              onClick={() => openSolution(index)}
+                            >
+                              Solution
+                            </Button>
+                          )}
+                          {!isStreamsMode && (
+                            <Button
+                              fullWidth
+                              variant="outlined"
+                              sx={{
+                                flex: { xs: "1 1 100%", sm: 1 },
+                                minWidth: { xs: "100%", sm: 100 },
+                                fontSize: { xs: "0.78rem", sm: "0.82rem" },
+                              }}
+                              onClick={(e) => youtubeExplain(e, index)}
+                            >
+                              Explanation
+                            </Button>
+                          )}
+                        </Stack>
+                        {isTaskCompleted(index) && (
                           <Button
                             fullWidth
                             variant="outlined"
-                            sx={{
-                              flex: { xs: "1 1 100%", sm: 1 },
-                              minWidth: { xs: "100%", sm: 100 },
-                              fontSize: { xs: "0.78rem", sm: "0.82rem" },
-                            }}
-                            onClick={(e) => youtubeExplain(e, index)}
+                            startIcon={<HistoryIcon />}
+                            onClick={() => viewSubmissionHistory(index)}
+                            sx={{ mt: 1 }}
                           >
-                            Explanation
+                            History
                           </Button>
                         )}
-                      </Stack>
-                      {isTaskCompleted(index) && (
-                        <Button
-                          fullWidth
-                          variant="outlined"
-                          startIcon={<HistoryIcon />}
-                          onClick={() => viewSubmissionHistory(index)}
-                          sx={{ mt: 1 }}
-                        >
-                          History
-                        </Button>
-                      )}
+                      </Box>
                     </CardContent>
                   </Card>
                 </Grid>

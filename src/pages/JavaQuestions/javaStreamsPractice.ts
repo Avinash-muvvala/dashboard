@@ -2,11 +2,21 @@ import type { QuestionItem } from "./JavaQuestions";
 
 export interface JavaStreamsQuestion extends QuestionItem {
   id: number;
+  difficulty: JavaStreamsDifficulty;
   expectedCollector: string;
   sampleInput?: string;
   expectedOutput?: string;
   answerCode?: string;
 }
+
+export type JavaStreamsDifficulty = "Easy" | "Medium" | "Hard";
+
+const getDifficulty = (pattern: string): JavaStreamsDifficulty => {
+  const patternNumber = Number(pattern.match(/^Pattern (\d+):/)?.[1]);
+  if ([4, 8, 12].includes(patternNumber)) return "Hard";
+  if ([3, 5, 7, 9, 10, 11].includes(patternNumber)) return "Medium";
+  return "Easy";
+};
 
 type RawStreamsQuestion = Pick<
   QuestionItem,
@@ -820,6 +830,7 @@ export const javaStreamsQuestions: JavaStreamsQuestion[] = rawQuestions.map(
   ({ question, pattern, hint }, index) => ({
     id: index + 1,
     question,
+    difficulty: getDifficulty(pattern ?? ""),
     explanation: "",
     inputs: examples[index + 1]?.input ?? "",
     pattern,

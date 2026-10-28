@@ -548,7 +548,20 @@ const SqlPracticePage = () => {
                   }}
                 />
               </Box>
-              <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.6 }}>
+              <Typography
+                variant="body1"
+                sx={{
+                  mb: 2,
+                  p: 1.5,
+                  borderLeft: "4px solid #1565c0",
+                  borderRadius: 1,
+                  backgroundColor: "#f2f7fc",
+                  color: "text.primary",
+                  fontSize: { xs: "1rem", sm: "1.05rem" },
+                  fontWeight: 600,
+                  lineHeight: 1.75,
+                }}
+              >
                 {question.description}
               </Typography>
 
@@ -583,29 +596,43 @@ const SqlPracticePage = () => {
                 )}
               </Box>
 
-              <Box
-                sx={{
-                  border: "1px solid #e0e0e0",
-                  borderRadius: 1,
-                  overflow: "hidden",
-                  mb: 2,
-                }}
-              >
-                <Editor
-                  height="200px"
-                  language="sql"
-                  theme="vs-light"
-                  value={code}
-                  onChange={(v) =>
-                    setDrafts((d) => ({ ...d, [selectedId]: v ?? "" }))
-                  }
-                  options={{
-                    minimap: { enabled: false },
-                    fontSize: 14,
-                    scrollBeyondLastLine: false,
-                    automaticLayout: true,
+              <Box sx={{ mb: 2 }}>
+                <Typography
+                  variant="caption"
+                  sx={{ display: "block", fontWeight: 800, mb: 0.5 }}
+                >
+                  SQL query
+                </Typography>
+                <Box
+                  sx={{
+                    border: "1px solid #b8c5d6",
+                    borderRadius: 1,
+                    overflow: "hidden",
+                    boxShadow: "0 1px 3px rgba(15, 23, 42, 0.08)",
                   }}
-                />
+                >
+                  <Editor
+                    height="200px"
+                    language="sql"
+                    theme="vs-light"
+                    value={code}
+                    onChange={(v) =>
+                      setDrafts((d) => ({ ...d, [selectedId]: v ?? "" }))
+                    }
+                    options={{
+                      minimap: { enabled: false },
+                      fontSize: 14,
+                      scrollBeyondLastLine: false,
+                      automaticLayout: true,
+                      scrollbar: {
+                        vertical: "visible",
+                        horizontal: "visible",
+                        verticalScrollbarSize: 10,
+                        horizontalScrollbarSize: 10,
+                      },
+                    }}
+                  />
+                </Box>
               </Box>
 
               <Stack
