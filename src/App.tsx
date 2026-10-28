@@ -43,6 +43,9 @@ const ReactPosts = lazy(() => import("./pages/REACTPOSTS/ReactPosts"));
 const CompanyQuestions = lazy(() => import("./pages/Company/CompanyQuestions"));
 const LearningPage = lazy(() => import("./pages/LearningPage"));
 const SqlPracticePage = lazy(() => import("./pages/SQL/SqlPracticePage"));
+const JavaStreamsPracticePage = lazy(
+  () => import("./pages/JavaQuestions/JavaStreamsPracticePage"),
+);
 
 // ─── Auth Guard ───────────────────────────────────────────────────────────────
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -200,6 +203,15 @@ const App = () => (
         <Route path="/learning" element={<LearningPage />} />
 
         <Route path="/sql-practice" element={<SqlPracticePage />} />
+
+        <Route
+          path="/java-streams-practice"
+          element={
+            <ProtectedRoute>
+              <JavaStreamsPracticePage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
