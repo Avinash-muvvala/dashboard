@@ -2626,7 +2626,7 @@ sys.stderr = sys.__stderr__
 
         <DialogContent sx={{ pt: 2 }}>
           <Grid container spacing={1.5}>
-            <Grid size={{ xs: 12, md: 8 }}>
+            <Grid size={{ xs: 12, md: 8 }} sx={{ order: { xs: 2, md: 2 } }}>
               {isJava ? (
                 <Box sx={{ minWidth: 0 }}>
                   <Typography
@@ -2727,7 +2727,7 @@ sys.stderr = sys.__stderr__
                 </>
               )}
             </Grid>
-            <Grid size={{ xs: 12, md: 4 }}>
+            <Grid size={{ xs: 12, md: 4 }} sx={{ order: { xs: 1, md: 1 } }}>
               <Paper
                 variant="outlined"
                 sx={{
@@ -2824,7 +2824,7 @@ sys.stderr = sys.__stderr__
                   )}
               </Paper>
             </Grid>
-            <Grid size={{ xs: 12 }}>
+            <Grid size={{ xs: 12 }} sx={{ order: 3 }}>
               <Paper
                 variant="outlined"
                 sx={{ overflow: "hidden", backgroundColor: "#111827" }}
