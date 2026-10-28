@@ -362,6 +362,8 @@ const readCompilerSession = (): CompilerSession | null => {
 };
 
 const Dashboard = () => {
+  const [hasSelectedLanguage, setHasSelectedLanguage] = useState(false);
+  const [hasSelectedDay, setHasSelectedDay] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageType>(() => {
     const session = readCompilerSession();
     const saved = readDashboardStorage().selectedLanguage;
@@ -1331,6 +1333,9 @@ sys.stderr = sys.__stderr__
                     onClick={() => {
                       setSelectedLanguage(language);
                       setSelectedDay("Day 1");
+                      setSelectedDifficulty(null);
+                      setHasSelectedLanguage(true);
+                      setHasSelectedDay(false);
                       setIsRevisionMode(false);
                       setIsStreamsMode(false);
                     }}
@@ -1392,7 +1397,7 @@ sys.stderr = sys.__stderr__
                 </Grid>
               ))}
 
-              <Grid size={{ xs: 3, sm: 3, md: 3 }}>
+              <Grid size={{ xs: 6, sm: 4, md: 3 }}>
                 <Card
                   onClick={() => navigate("/learning")}
                   sx={{
@@ -1914,507 +1919,535 @@ sys.stderr = sys.__stderr__
             </Grid>
           </Box>
 
-          {/* Day Selection */}
-          <Paper
-            sx={{
-              p: { xs: 2, md: 2.5 },
-              borderRadius: 3,
-              backgroundColor: "rgba(255,255,255,0.95)",
-              boxShadow: "0 14px 40px rgba(15, 23, 42, 0.08)",
-              border: "1px solid rgba(145, 158, 171, 0.16)",
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 700, mb: 1.5, fontSize: "1rem" }}
-            >
-              📅 Select Day: {selectedLanguage}
-            </Typography>
-
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 700, mb: 1.5, fontSize: "1rem" }}
-            >
-              🎯 Select Difficulty
-            </Typography>
-            <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
-              {(["Easy", "Medium", "Hard"] as DifficultyType[]).map((diff) => (
-                <Chip
-                  key={diff}
-                  label={diff}
-                  onClick={() => {
-                    setIsRevisionMode(false);
-                    setIsStreamsMode(false);
-                    const nextDifficulty =
-                      selectedDifficulty === diff ? null : diff;
-                    setSelectedDifficulty(nextDifficulty);
-                    if (nextDifficulty) {
-                      setSelectedDay(difficultyDays[nextDifficulty][0]);
-                    }
-                  }}
-                  variant={selectedDifficulty === diff ? "filled" : "outlined"}
-                  sx={{
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    height: 32,
-                    ...(selectedDifficulty === diff && {
-                      backgroundColor: difficultyColors[diff],
-                      color: "#fff",
-                    }),
-                    ...(selectedDifficulty !== diff && {
-                      borderColor: difficultyColors[diff],
-                      color: difficultyColors[diff],
-                    }),
-                  }}
-                />
-              ))}
-              {selectedLanguage === "Java" && (
-                <Chip
-                  label="Java Streams"
-                  icon={<CodeIcon />}
-                  onClick={() => {
-                    setIsRevisionMode(false);
-                    setIsStreamsMode(false);
-                    try {
-                      localStorage.setItem(
-                        dashboardStorageKey,
-                        JSON.stringify({
-                          ...readDashboardStorage(),
-                          isStreamsMode: false,
-                        }),
-                      );
-                    } catch {
-                      // Ignore storage errors while opening practice.
-                    }
-                    navigate("/java-streams-practice");
-                  }}
-                  variant="outlined"
-                  sx={{ fontWeight: 700, cursor: "pointer", height: 32 }}
-                />
-              )}
-            </Box>
-
-            {/* ✅ Use Box with flexWrap + gap instead of Stack */}
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {(isStreamsMode
-                ? []
-                : selectedDifficulty
-                  ? difficultyDays[selectedDifficulty]
-                  : days
-              ).map((day) => (
-                <Chip
-                  key={day}
-                  label={day}
-                  onClick={() => {
-                    setSelectedDay(day);
-                    setIsRevisionMode(false);
-                  }}
-                  color={
-                    selectedDay === day && !isRevisionMode
-                      ? "primary"
-                      : "default"
-                  }
-                  variant={
-                    selectedDay === day && !isRevisionMode
-                      ? "filled"
-                      : "outlined"
-                  }
-                  icon={
-                    selectedDay === day && !isRevisionMode ? (
-                      <CheckCircleIcon />
-                    ) : undefined
-                  }
-                  sx={{
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    height: 32,
-                    "& .MuiChip-label": {
-                      px: 1.5,
-                    },
-                  }}
-                />
-              ))}
-              {selectedLanguage === "Java" && !isStreamsMode && (
-                <Chip
-                  label="Revision"
-                  onClick={() => setIsRevisionMode(true)}
-                  color={isRevisionMode ? "secondary" : "default"}
-                  variant={isRevisionMode ? "filled" : "outlined"}
-                  icon={isRevisionMode ? <HistoryIcon /> : undefined}
-                  sx={{
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    height: 32,
-                  }}
-                />
-              )}
-            </Box>
-
-            {isStreamsMode && (
-              <Button
-                component="a"
-                href="/pdfs/java-streams-pattern-playbook.pdf"
-                target="_blank"
-                rel="noreferrer"
-                variant="outlined"
-                sx={{ mt: 2 }}
-              >
-                Open Streams pattern playbook
-              </Button>
-            )}
-
-            {/* Progress */}
-            <Box sx={{ mt: 3 }}>
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+          {hasSelectedLanguage && (
+            <>
+              {/* Day Selection */}
+              <Paper
+                sx={{
+                  p: { xs: 2, md: 2.5 },
+                  borderRadius: 3,
+                  backgroundColor: "rgba(255,255,255,0.95)",
+                  boxShadow: "0 14px 40px rgba(15, 23, 42, 0.08)",
+                  border: "1px solid rgba(145, 158, 171, 0.16)",
+                }}
               >
                 <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 600, color: "text.secondary" }}
+                  variant="h6"
+                  sx={{ fontWeight: 700, mb: 1.5, fontSize: "1rem" }}
                 >
-                  {isStreamsMode ? "Java Streams Progress" : "Today's Progress"}
+                  🎯 Select Difficulty
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                  {tasks.filter((_, i) => isTaskCompleted(i)).length}/
-                  {tasks.length}
-                </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={
-                  tasks.length
-                    ? Math.round(
-                        (tasks.filter((_, i) => isTaskCompleted(i)).length /
-                          tasks.length) *
-                          100,
-                      )
-                    : 0
-                }
-                sx={{
-                  height: 10,
-                  borderRadius: 5,
-                  backgroundColor: "#e0e0e0",
-                  "& .MuiLinearProgress-bar": {
-                    borderRadius: 5,
-                    background: `linear-gradient(90deg, ${languageColors[selectedLanguage]}, #00bcd4)`,
-                  },
-                }}
-              />
-            </Box>
-          </Paper>
-
-          {/* Content Layout */}
-          {/* Questions Display */}
-          <Grid size={{ xs: 12 }}>
-            <Grid container spacing={1.5}>
-              {tasks.map((question, index) => (
-                <Grid size={{ xs: 12, sm: 6 }} key={index}>
-                  <Card
-                    sx={{
-                      borderRadius: 3,
-                      transition: "all 0.3s ease",
-                      border: isTaskCompleted(index)
-                        ? `2px solid #4caf50`
-                        : "1px solid rgba(15, 23, 42, 0.12)",
-                      backgroundColor: isTaskCompleted(index)
-                        ? "#f0fbf4"
-                        : "#ffffff",
-                      boxShadow: "0 12px 36px rgba(15, 23, 42, 0.06)",
-                      "&:hover": {
-                        boxShadow: "0 18px 42px rgba(15, 23, 42, 0.12)",
-                        transform: "translateY(-4px)",
-                      },
-                    }}
-                  >
-                    <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          mb: 1,
+                <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
+                  {(["Easy", "Medium", "Hard"] as DifficultyType[]).map(
+                    (diff) => (
+                      <Chip
+                        key={diff}
+                        label={diff}
+                        onClick={() => {
+                          setIsRevisionMode(false);
+                          setIsStreamsMode(false);
+                          const nextDifficulty =
+                            selectedDifficulty === diff ? null : diff;
+                          setSelectedDifficulty(nextDifficulty);
+                          setHasSelectedDay(false);
+                          if (nextDifficulty) {
+                            setSelectedDay(difficultyDays[nextDifficulty][0]);
+                          }
                         }}
-                      >
-                        <Chip
-                          label={`${isStreamsMode ? "Java Streams" : isRevisionMode ? "Revision" : selectedDay} - Q${index + 1}`}
-                          size="small"
-                          sx={{
-                            backgroundColor: languageColors[selectedLanguage],
+                        variant={
+                          selectedDifficulty === diff ? "filled" : "outlined"
+                        }
+                        sx={{
+                          fontSize: "13px",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          height: 32,
+                          ...(selectedDifficulty === diff && {
+                            backgroundColor: difficultyColors[diff],
                             color: "#fff",
-                            fontWeight: "bold",
+                          }),
+                          ...(selectedDifficulty !== diff && {
+                            borderColor: difficultyColors[diff],
+                            color: difficultyColors[diff],
+                          }),
+                        }}
+                      />
+                    ),
+                  )}
+                  {selectedLanguage === "Java" && (
+                    <Chip
+                      label="Java Streams"
+                      icon={<CodeIcon />}
+                      onClick={() => {
+                        setIsRevisionMode(false);
+                        setIsStreamsMode(false);
+                        try {
+                          localStorage.setItem(
+                            dashboardStorageKey,
+                            JSON.stringify({
+                              ...readDashboardStorage(),
+                              isStreamsMode: false,
+                            }),
+                          );
+                        } catch {
+                          // Ignore storage errors while opening practice.
+                        }
+                        navigate("/java-streams-practice");
+                      }}
+                      variant="outlined"
+                      sx={{ fontWeight: 700, cursor: "pointer", height: 32 }}
+                    />
+                  )}
+                </Box>
+
+                {selectedDifficulty && (
+                  <>
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: 700, mb: 1.5, mt: 2, fontSize: "1rem" }}
+                    >
+                      📅 Select Day: {selectedLanguage}
+                    </Typography>
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                      {difficultyDays[selectedDifficulty].map((day) => (
+                        <Chip
+                          key={day}
+                          label={day}
+                          onClick={() => {
+                            setSelectedDay(day);
+                            setHasSelectedDay(true);
+                            setIsRevisionMode(false);
+                          }}
+                          color={
+                            selectedDay === day && hasSelectedDay
+                              ? "primary"
+                              : "default"
+                          }
+                          variant={
+                            selectedDay === day && hasSelectedDay
+                              ? "filled"
+                              : "outlined"
+                          }
+                          icon={
+                            selectedDay === day && hasSelectedDay ? (
+                              <CheckCircleIcon />
+                            ) : undefined
+                          }
+                          sx={{
+                            fontSize: "13px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            height: 32,
+                            "& .MuiChip-label": { px: 1.5 },
                           }}
                         />
-                        {isTaskCompleted(index) && (
-                          <CheckCircleIcon
-                            sx={{ color: "#4caf50", fontSize: "24px" }}
-                          />
-                        )}
-                      </Box>
-
-                      {/* Render Question Title */}
-                      <Typography
-                        variant="subtitle1"
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: "1rem",
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        {typeof question === "object"
-                          ? question.question
-                          : question}
-                      </Typography>
-                      <Box
-                        component="details"
-                        sx={{
-                          mt: 1,
-                          "& > summary": {
-                            cursor: "pointer",
-                            color: "primary.main",
-                            fontSize: "0.875rem",
+                      ))}
+                      {selectedLanguage === "Java" && (
+                        <Chip
+                          label="Revision"
+                          onClick={() => setIsRevisionMode(true)}
+                          color={isRevisionMode ? "secondary" : "default"}
+                          variant={isRevisionMode ? "filled" : "outlined"}
+                          icon={isRevisionMode ? <HistoryIcon /> : undefined}
+                          sx={{
+                            fontSize: "13px",
                             fontWeight: 700,
-                            py: 0.5,
-                          },
-                        }}
+                            cursor: "pointer",
+                            height: 32,
+                          }}
+                        />
+                      )}
+                    </Box>
+                  </>
+                )}
+
+                {isStreamsMode && (
+                  <Button
+                    component="a"
+                    href="/pdfs/java-streams-pattern-playbook.pdf"
+                    target="_blank"
+                    rel="noreferrer"
+                    variant="outlined"
+                    sx={{ mt: 2 }}
+                  >
+                    Open Streams pattern playbook
+                  </Button>
+                )}
+
+                {(hasSelectedDay || isRevisionMode || isStreamsMode) && (
+                  <Box sx={{ mt: 3 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1,
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 600, color: "text.secondary" }}
                       >
-                        <Typography component="summary" variant="body2">
-                          Show details and practice options
-                        </Typography>
-                        {typeof question === "object" && question.pattern && (
-                          <Chip
-                            label={question.pattern}
-                            size="small"
-                            variant="outlined"
-                            sx={{ mt: 1 }}
-                          />
-                        )}
-                        {typeof question === "object" && question.hint && (
-                          <details style={{ marginTop: 12 }}>
-                            <summary style={{ cursor: "pointer" }}>
-                              Show hint
-                            </summary>
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                              sx={{ mt: 0.75 }}
-                            >
-                              {question.hint}
-                            </Typography>
-                          </details>
-                        )}
-                        {typeof question === "object" &&
-                          question.explanation && (
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                              sx={{ mt: 0.5, lineHeight: 1.4 }}
-                            >
-                              {question.explanation}
-                            </Typography>
-                          )}
-                        {/* Added Input Display Section */}
-                        {typeof question === "object" && question.inputs && (
-                          <Box
-                            sx={{
-                              mt: 1.5,
-                              p: 1,
-                              borderRadius: 1.5,
-                              backgroundColor: "#f8f9fa",
-                              border: "1px dashed rgba(0,0,0,0.12)",
-                            }}
-                          >
-                            <Typography>Sample Inputs:</Typography>
-                            <Typography
-                              variant="body2"
-                              color="text.primary"
-                              sx={{
-                                fontFamily: "monospace",
-                                wordBreak: "break-all",
-                              }}
-                            >
-                              {question.inputs}
-                            </Typography>
-                          </Box>
-                        )}
-                        {typeof question === "object" && question.inputs && (
-                          <Box
-                            sx={{
-                              mt: 1,
-                              p: 1,
-                              borderRadius: 1.5,
-                              backgroundColor: "#f1f8ff",
-                              border: "1px dashed rgba(25, 118, 210, 0.24)",
-                            }}
-                          >
-                            <Typography>Expected Output:</Typography>
-                            <Typography
-                              variant="body2"
-                              color="text.primary"
-                              sx={{
-                                fontFamily: "monospace",
-                                wordBreak: "break-all",
-                              }}
-                            >
-                              {getExpectedOutput(question)}
-                            </Typography>
-                          </Box>
-                        )}
+                        {isStreamsMode
+                          ? "Java Streams Progress"
+                          : "Today's Progress"}
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                        {tasks.filter((_, i) => isTaskCompleted(i)).length}/
+                        {tasks.length}
+                      </Typography>
+                    </Box>
+                    <LinearProgress
+                      variant="determinate"
+                      value={
+                        tasks.length
+                          ? Math.round(
+                              (tasks.filter((_, i) => isTaskCompleted(i))
+                                .length /
+                                tasks.length) *
+                                100,
+                            )
+                          : 0
+                      }
+                      sx={{
+                        height: 10,
+                        borderRadius: 5,
+                        backgroundColor: "#e0e0e0",
+                        "& .MuiLinearProgress-bar": {
+                          borderRadius: 5,
+                          background: `linear-gradient(90deg, ${languageColors[selectedLanguage]}, #00bcd4)`,
+                        },
+                      }}
+                    />
+                  </Box>
+                )}
+              </Paper>
 
-                        {isRevisionMode && typeof question === "object" && (
-                          <Box
-                            sx={{
-                              mt: 1.5,
-                              p: 1.5,
-                              borderRadius: 1.5,
-                              backgroundColor: "#fff8e1",
-                              border: "1px solid #ffe082",
-                            }}
-                          >
-                            <Typography
-                              variant="subtitle2"
-                              sx={{ fontWeight: 800, mb: 0.75 }}
-                            >
-                              Submission History
-                            </Typography>
-                            {(() => {
-                              const submission =
-                                getRevisionSubmission(question);
-
-                              return submission ? (
-                                <>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{ fontWeight: 700, mb: 0.5 }}
-                                  >
-                                    Your latest submitted solution
-                                  </Typography>
-                                  <Box
-                                    component="pre"
-                                    sx={{
-                                      m: 0,
-                                      p: 1.25,
-                                      backgroundColor: "#1e1e1e",
-                                      color: "#d4d4d4",
-                                      borderRadius: 1,
-                                      overflowX: "auto",
-                                      fontFamily: "monospace",
-                                      fontSize: 12,
-                                      whiteSpace: "pre-wrap",
-                                    }}
-                                  >
-                                    {submission.code}
-                                  </Box>
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      display: "block",
-                                      mt: 1,
-                                      fontWeight: 700,
-                                    }}
-                                  >
-                                    Submitted output
-                                  </Typography>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{
-                                      fontFamily: "monospace",
-                                      whiteSpace: "pre-wrap",
-                                    }}
-                                  >
-                                    {submission.executionOutput}
-                                  </Typography>
-                                </>
-                              ) : (
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  No submitted solution yet. Click Code Now to
-                                  practice.
-                                </Typography>
-                              );
-                            })()}
-                          </Box>
-                        )}
-
-                        <Stack
-                          direction="row"
-                          spacing={1}
-                          sx={{ mt: 2, flexWrap: "wrap" }}
+              {/* Content Layout */}
+              {/* Questions Display */}
+              {(hasSelectedDay || isRevisionMode || isStreamsMode) && (
+                <Grid size={{ xs: 12 }}>
+                  <Grid container spacing={1.5}>
+                    {tasks.map((question, index) => (
+                      <Grid size={{ xs: 12, sm: 6 }} key={index}>
+                        <Card
+                          sx={{
+                            borderRadius: 3,
+                            transition: "all 0.3s ease",
+                            border: isTaskCompleted(index)
+                              ? `2px solid #4caf50`
+                              : "1px solid rgba(15, 23, 42, 0.12)",
+                            backgroundColor: isTaskCompleted(index)
+                              ? "#f0fbf4"
+                              : "#ffffff",
+                            boxShadow: "0 12px 36px rgba(15, 23, 42, 0.06)",
+                            "&:hover": {
+                              boxShadow: "0 18px 42px rgba(15, 23, 42, 0.12)",
+                              transform: "translateY(-4px)",
+                            },
+                          }}
                         >
-                          <Button
-                            fullWidth
-                            variant="contained"
-                            startIcon={<CodeIcon />}
-                            onClick={() => openCompiler(index)}
-                            sx={{
-                              flex: { xs: "1 1 100%", sm: 1 },
-                              minWidth: { xs: "100%", sm: 100 },
-                              fontSize: { xs: "0.78rem", sm: "0.82rem" },
-                              background: `linear-gradient(135deg, ${languageColors[selectedLanguage]}, #00bcd4)`,
-                            }}
-                          >
-                            Code Now
-                          </Button>
-                          {!isRevisionMode && !isStreamsMode && (
-                            <Button
-                              fullWidth
-                              variant="outlined"
-                              startIcon={<LightbulbIcon />}
+                          <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
+                            <Box
                               sx={{
-                                flex: { xs: "1 1 100%", sm: 1 },
-                                minWidth: { xs: "100%", sm: 100 },
-                                fontSize: { xs: "0.78rem", sm: "0.82rem" },
-                                borderColor:
-                                  selectedLanguage === "Java"
-                                    ? languageColors[selectedLanguage]
-                                    : undefined,
-                                color:
-                                  selectedLanguage === "Java"
-                                    ? languageColors[selectedLanguage]
-                                    : undefined,
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                mb: 1,
                               }}
-                              onClick={() => openSolution(index)}
                             >
-                              Solution
-                            </Button>
-                          )}
-                          {!isStreamsMode && (
-                            <Button
-                              fullWidth
-                              variant="outlined"
+                              <Chip
+                                label={`${isStreamsMode ? "Java Streams" : isRevisionMode ? "Revision" : selectedDay} - Q${index + 1}`}
+                                size="small"
+                                sx={{
+                                  backgroundColor:
+                                    languageColors[selectedLanguage],
+                                  color: "#fff",
+                                  fontWeight: "bold",
+                                }}
+                              />
+                              {isTaskCompleted(index) && (
+                                <CheckCircleIcon
+                                  sx={{ color: "#4caf50", fontSize: "24px" }}
+                                />
+                              )}
+                            </Box>
+
+                            {/* Render Question Title */}
+                            <Typography
+                              variant="subtitle1"
                               sx={{
-                                flex: { xs: "1 1 100%", sm: 1 },
-                                minWidth: { xs: "100%", sm: 100 },
-                                fontSize: { xs: "0.78rem", sm: "0.82rem" },
+                                fontWeight: 700,
+                                fontSize: "1rem",
+                                lineHeight: 1.5,
                               }}
-                              onClick={(e) => youtubeExplain(e, index)}
                             >
-                              Explanation
-                            </Button>
-                          )}
-                        </Stack>
-                        {isTaskCompleted(index) && (
-                          <Button
-                            fullWidth
-                            variant="outlined"
-                            startIcon={<HistoryIcon />}
-                            onClick={() => viewSubmissionHistory(index)}
-                            sx={{ mt: 1 }}
-                          >
-                            History
-                          </Button>
-                        )}
-                      </Box>
-                    </CardContent>
-                  </Card>
+                              {typeof question === "object"
+                                ? question.question
+                                : question}
+                            </Typography>
+                            <Box
+                              component="details"
+                              sx={{
+                                mt: 1,
+                                "& > summary": {
+                                  cursor: "pointer",
+                                  color: "primary.main",
+                                  fontSize: "0.875rem",
+                                  fontWeight: 700,
+                                  py: 0.5,
+                                },
+                              }}
+                            >
+                              <Typography component="summary" variant="body2">
+                                Show details and practice options
+                              </Typography>
+                              {typeof question === "object" &&
+                                question.pattern && (
+                                  <Chip
+                                    label={question.pattern}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{ mt: 1 }}
+                                  />
+                                )}
+                              {typeof question === "object" &&
+                                question.hint && (
+                                  <details style={{ marginTop: 12 }}>
+                                    <summary style={{ cursor: "pointer" }}>
+                                      Show hint
+                                    </summary>
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                      sx={{ mt: 0.75 }}
+                                    >
+                                      {question.hint}
+                                    </Typography>
+                                  </details>
+                                )}
+                              {typeof question === "object" &&
+                                question.explanation && (
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mt: 0.5, lineHeight: 1.4 }}
+                                  >
+                                    {question.explanation}
+                                  </Typography>
+                                )}
+                              {/* Added Input Display Section */}
+                              {typeof question === "object" &&
+                                question.inputs && (
+                                  <Box
+                                    sx={{
+                                      mt: 1.5,
+                                      p: 1,
+                                      borderRadius: 1.5,
+                                      backgroundColor: "#f8f9fa",
+                                      border: "1px dashed rgba(0,0,0,0.12)",
+                                    }}
+                                  >
+                                    <Typography>Sample Inputs:</Typography>
+                                    <Typography
+                                      variant="body2"
+                                      color="text.primary"
+                                      sx={{
+                                        fontFamily: "monospace",
+                                        wordBreak: "break-all",
+                                      }}
+                                    >
+                                      {question.inputs}
+                                    </Typography>
+                                  </Box>
+                                )}
+                              {typeof question === "object" &&
+                                question.inputs && (
+                                  <Box
+                                    sx={{
+                                      mt: 1,
+                                      p: 1,
+                                      borderRadius: 1.5,
+                                      backgroundColor: "#f1f8ff",
+                                      border:
+                                        "1px dashed rgba(25, 118, 210, 0.24)",
+                                    }}
+                                  >
+                                    <Typography>Expected Output:</Typography>
+                                    <Typography
+                                      variant="body2"
+                                      color="text.primary"
+                                      sx={{
+                                        fontFamily: "monospace",
+                                        wordBreak: "break-all",
+                                      }}
+                                    >
+                                      {getExpectedOutput(question)}
+                                    </Typography>
+                                  </Box>
+                                )}
+
+                              {isRevisionMode &&
+                                typeof question === "object" && (
+                                  <Box
+                                    sx={{
+                                      mt: 1.5,
+                                      p: 1.5,
+                                      borderRadius: 1.5,
+                                      backgroundColor: "#fff8e1",
+                                      border: "1px solid #ffe082",
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="subtitle2"
+                                      sx={{ fontWeight: 800, mb: 0.75 }}
+                                    >
+                                      Submission History
+                                    </Typography>
+                                    {(() => {
+                                      const submission =
+                                        getRevisionSubmission(question);
+
+                                      return submission ? (
+                                        <>
+                                          <Typography
+                                            variant="body2"
+                                            sx={{ fontWeight: 700, mb: 0.5 }}
+                                          >
+                                            Your latest submitted solution
+                                          </Typography>
+                                          <Box
+                                            component="pre"
+                                            sx={{
+                                              m: 0,
+                                              p: 1.25,
+                                              backgroundColor: "#1e1e1e",
+                                              color: "#d4d4d4",
+                                              borderRadius: 1,
+                                              overflowX: "auto",
+                                              fontFamily: "monospace",
+                                              fontSize: 12,
+                                              whiteSpace: "pre-wrap",
+                                            }}
+                                          >
+                                            {submission.code}
+                                          </Box>
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              display: "block",
+                                              mt: 1,
+                                              fontWeight: 700,
+                                            }}
+                                          >
+                                            Submitted output
+                                          </Typography>
+                                          <Typography
+                                            variant="body2"
+                                            sx={{
+                                              fontFamily: "monospace",
+                                              whiteSpace: "pre-wrap",
+                                            }}
+                                          >
+                                            {submission.executionOutput}
+                                          </Typography>
+                                        </>
+                                      ) : (
+                                        <Typography
+                                          variant="body2"
+                                          color="text.secondary"
+                                        >
+                                          No submitted solution yet. Click Code
+                                          Now to practice.
+                                        </Typography>
+                                      );
+                                    })()}
+                                  </Box>
+                                )}
+
+                              <Stack
+                                direction="row"
+                                spacing={1}
+                                sx={{ mt: 2, flexWrap: "wrap" }}
+                              >
+                                <Button
+                                  fullWidth
+                                  variant="contained"
+                                  startIcon={<CodeIcon />}
+                                  onClick={() => openCompiler(index)}
+                                  sx={{
+                                    flex: { xs: "1 1 100%", sm: 1 },
+                                    minWidth: { xs: "100%", sm: 100 },
+                                    fontSize: { xs: "0.78rem", sm: "0.82rem" },
+                                    background: `linear-gradient(135deg, ${languageColors[selectedLanguage]}, #00bcd4)`,
+                                  }}
+                                >
+                                  Code Now
+                                </Button>
+                                {!isRevisionMode && !isStreamsMode && (
+                                  <Button
+                                    fullWidth
+                                    variant="outlined"
+                                    startIcon={<LightbulbIcon />}
+                                    sx={{
+                                      flex: { xs: "1 1 100%", sm: 1 },
+                                      minWidth: { xs: "100%", sm: 100 },
+                                      fontSize: {
+                                        xs: "0.78rem",
+                                        sm: "0.82rem",
+                                      },
+                                      borderColor:
+                                        selectedLanguage === "Java"
+                                          ? languageColors[selectedLanguage]
+                                          : undefined,
+                                      color:
+                                        selectedLanguage === "Java"
+                                          ? languageColors[selectedLanguage]
+                                          : undefined,
+                                    }}
+                                    onClick={() => openSolution(index)}
+                                  >
+                                    Solution
+                                  </Button>
+                                )}
+                                {!isStreamsMode && (
+                                  <Button
+                                    fullWidth
+                                    variant="outlined"
+                                    sx={{
+                                      flex: { xs: "1 1 100%", sm: 1 },
+                                      minWidth: { xs: "100%", sm: 100 },
+                                      fontSize: {
+                                        xs: "0.78rem",
+                                        sm: "0.82rem",
+                                      },
+                                    }}
+                                    onClick={(e) => youtubeExplain(e, index)}
+                                  >
+                                    Explanation
+                                  </Button>
+                                )}
+                              </Stack>
+                              {isTaskCompleted(index) && (
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  startIcon={<HistoryIcon />}
+                                  onClick={() => viewSubmissionHistory(index)}
+                                  sx={{ mt: 1 }}
+                                >
+                                  History
+                                </Button>
+                              )}
+                            </Box>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
                 </Grid>
-              ))}
-            </Grid>
-          </Grid>
+              )}
+            </>
+          )}
         </Stack>
       </Box>
 
