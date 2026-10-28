@@ -1977,28 +1977,41 @@ sys.stderr = sys.__stderr__
                     ),
                   )}
                   {selectedLanguage === "Java" && (
-                    <Chip
-                      label="Java Streams"
-                      icon={<CodeIcon />}
-                      onClick={() => {
-                        setIsRevisionMode(false);
-                        setIsStreamsMode(false);
-                        try {
-                          localStorage.setItem(
-                            dashboardStorageKey,
-                            JSON.stringify({
-                              ...readDashboardStorage(),
-                              isStreamsMode: false,
-                            }),
-                          );
-                        } catch {
-                          // Ignore storage errors while opening practice.
-                        }
-                        navigate("/java-streams-practice");
-                      }}
-                      variant="outlined"
-                      sx={{ fontWeight: 700, cursor: "pointer", height: 32 }}
-                    />
+                    <>
+                      <Chip
+                        label="Java Streams"
+                        icon={<CodeIcon />}
+                        onClick={() => {
+                          setIsRevisionMode(false);
+                          setIsStreamsMode(false);
+                          try {
+                            localStorage.setItem(
+                              dashboardStorageKey,
+                              JSON.stringify({
+                                ...readDashboardStorage(),
+                                isStreamsMode: false,
+                              }),
+                            );
+                          } catch {
+                            // Ignore storage errors while opening practice.
+                          }
+                          navigate("/java-streams-practice");
+                        }}
+                        variant="outlined"
+                        sx={{ fontWeight: 700, cursor: "pointer", height: 32 }}
+                      />
+                      <Chip
+                        label="Java Strings"
+                        icon={<CodeIcon />}
+                        onClick={() => {
+                          setIsRevisionMode(false);
+                          setIsStreamsMode(false);
+                          navigate("/java-strings-practice");
+                        }}
+                        variant="outlined"
+                        sx={{ fontWeight: 700, cursor: "pointer", height: 32 }}
+                      />
+                    </>
                   )}
                 </Box>
 

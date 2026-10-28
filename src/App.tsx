@@ -46,6 +46,9 @@ const SqlPracticePage = lazy(() => import("./pages/SQL/SqlPracticePage"));
 const JavaStreamsPracticePage = lazy(
   () => import("./pages/JavaQuestions/JavaStreamsPracticePage"),
 );
+const JavaStringPracticePage = lazy(
+  () => import("./pages/JavaQuestions/JavaStringPracticePage"),
+);
 
 // ─── Auth Guard ───────────────────────────────────────────────────────────────
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -209,6 +212,14 @@ const App = () => (
           element={
             <ProtectedRoute>
               <JavaStreamsPracticePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/java-strings-practice"
+          element={
+            <ProtectedRoute>
+              <JavaStringPracticePage />
             </ProtectedRoute>
           }
         />
