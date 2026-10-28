@@ -667,7 +667,9 @@ const Dashboard = () => {
     // 2. Pass the entire object or string to your state
     setCurrentQuestion(currentTask);
 
-    setSubmissionCode(languageTemplates[selectedLanguage]);
+    const draftKey = `${selectedLanguage}_${currentPracticeDay}_${taskIndex}`;
+    const savedDraft = readDashboardStorage().drafts?.[draftKey];
+    setSubmissionCode(savedDraft ?? languageTemplates[selectedLanguage]);
     setSubmissionOutput("");
     setSubmissionStatus(null);
     setTabValue(0);
