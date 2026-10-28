@@ -611,4 +611,32 @@ export const SpringBootPracticeQuestions: Record<
         "It controls the computational cost of hashing. A higher cost makes password guessing more expensive, but should be tuned so legitimate authentication remains acceptably responsive.",
     },
   ],
+  147: [
+    {
+      question:
+        "How should passwords be handled during registration and login with BCryptPasswordEncoder?",
+      answer:
+        "During registration, encode the raw password with `encode()` before storing it. During login, pass the raw password and stored hash to `matches()` to verify the credentials.",
+    },
+    {
+      question:
+        "Why should BCrypt hashes not be compared with String.equals()?",
+      answer:
+        "BCrypt uses a unique salt for each hash, so encoding the same password again produces a different string. `matches()` verifies the raw password against the salt and hash already stored.",
+    },
+  ],
+  148: [
+    {
+      question:
+        "What is the request flow through Spring Security's filter chain?",
+      answer:
+        "A request passes from the servlet container through `DelegatingFilterProxy` to `FilterChainProxy`, which selects a matching `SecurityFilterChain` and applies its filters before the request can reach the controller.",
+    },
+    {
+      question:
+        "How does Spring Security select a SecurityFilterChain for a request?",
+      answer:
+        "`FilterChainProxy` evaluates the configured request matchers of the registered `SecurityFilterChain` beans and uses the first matching chain.",
+    },
+  ],
 };

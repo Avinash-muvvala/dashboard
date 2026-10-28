@@ -194,6 +194,30 @@ const additionalQuestions = {
         "Context is useful when many descendants need the same value across a component subtree and passing it through intermediate components would create excessive prop drilling.",
     },
   ],
+  36: [
+    {
+      question: "When is passing props preferable to using Context?",
+      answer:
+        "Use props when data is needed by a child or a small number of nearby descendants. Explicit props make component dependencies clear and keep components easier to reuse.",
+    },
+    {
+      question: "Why should Context be split by concern?",
+      answer:
+        "Separate contexts for unrelated values, such as authentication and theme, help limit which consumers update when a provider value changes.",
+    },
+  ],
+  37: [
+    {
+      question: "How does server state differ from local UI state?",
+      answer:
+        "Local UI state is owned by the client interface, such as whether a modal is open. Server state comes from a remote source and needs asynchronous fetching, caching, and synchronization.",
+    },
+    {
+      question: "When might an external state library be useful?",
+      answer:
+        "It can help when application-wide state is complex or widely shared and is difficult to manage cleanly with local state, props, or Context alone.",
+    },
+  ],
 } satisfies Record<number, { question: string; answer: string }[]>;
 
 export const ReactPracticeQuestions: Record<
