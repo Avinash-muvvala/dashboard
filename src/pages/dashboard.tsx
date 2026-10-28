@@ -2457,96 +2457,12 @@ sys.stderr = sys.__stderr__
       <Dialog
         open={openSubmissionDialog}
         onClose={closeCompiler}
-        maxWidth="lg"
+        maxWidth="xl"
         fullWidth
       >
-        <DialogTitle>
-          💻 {selectedLanguage} Code Editor -{" "}
-          {typeof currentQuestion === "object"
-            ? currentQuestion.question
-            : currentQuestion}
+        <DialogTitle sx={{ borderBottom: "1px solid", borderColor: "divider" }}>
+          💻 {selectedLanguage} Code Practice
         </DialogTitle>
-        <Box
-          sx={{
-            mx: 3,
-            mb: 1,
-            p: 2,
-            borderRadius: 1.5,
-            backgroundColor: "#f8f9fa",
-            border: "1px solid rgba(15, 23, 42, 0.12)",
-            maxHeight: 180,
-            overflowY: "auto",
-          }}
-        >
-          <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 0.5 }}>
-            Question
-          </Typography>
-          <Typography variant="body2" sx={{ lineHeight: 1.5 }}>
-            {typeof currentQuestion === "object"
-              ? currentQuestion.question
-              : currentQuestion}
-          </Typography>
-          {typeof currentQuestion === "object" &&
-            currentQuestion.explanation && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 1, lineHeight: 1.5 }}
-              >
-                {currentQuestion.explanation}
-              </Typography>
-            )}
-          {typeof currentQuestion === "object" && currentQuestion.inputs && (
-            <Box
-              sx={{
-                mt: 1.5,
-                p: 1,
-                borderRadius: 1,
-                backgroundColor: "#ffffff",
-                border: "1px dashed rgba(0, 0, 0, 0.18)",
-              }}
-            >
-              <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                Sample Inputs
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  mt: 0.25,
-                  fontFamily: "monospace",
-                  wordBreak: "break-all",
-                }}
-              >
-                {currentQuestion.inputs}
-              </Typography>
-            </Box>
-          )}
-          {typeof currentQuestion === "object" && currentQuestion.inputs && (
-            <Box
-              sx={{
-                mt: 1.5,
-                p: 1,
-                borderRadius: 1,
-                backgroundColor: "#f1f8ff",
-                border: "1px dashed rgba(25, 118, 210, 0.24)",
-              }}
-            >
-              <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                Expected Output
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  mt: 0.25,
-                  fontFamily: "monospace",
-                  wordBreak: "break-all",
-                }}
-              >
-                {getExpectedOutput(currentQuestion)}
-              </Typography>
-            </Box>
-          )}
-        </Box>
         {/* <DialogContent sx={{ pt: 2 }}>
           <Tabs
             value={tabValue}
@@ -2696,169 +2612,254 @@ sys.stderr = sys.__stderr__
         </DialogContent> */}
 
         <DialogContent sx={{ pt: 2 }}>
-          {isJava ? (
-            <Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                Write your code, click <b>Run</b> in the compiler, then press{" "}
-                <b>Submit Code</b>.
-              </Typography>
-              <iframe
-                ref={compilerIframeRef}
-                key={`${selectedDay}-${currentTaskIndex}`}
-                src="https://onecompiler.com/embed/java?theme=dark&listenToEvents=true&codeChangeEvent=true"
-                width="100%"
-                height="500px"
-                style={{ border: "none", borderRadius: "8px" }}
-                title="Java Online Compiler"
-                onLoad={handleCompilerLoad}
-              />
-              <Box
+          <Grid container spacing={1.5}>
+            <Grid size={{ xs: 12, md: 8 }}>
+              {isJava ? (
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1 }}
+                  >
+                    Write your code, click <b>Run</b> in the compiler, then
+                    press <b>Submit Code</b>.
+                  </Typography>
+                  <iframe
+                    ref={compilerIframeRef}
+                    key={`${selectedDay}-${currentTaskIndex}`}
+                    src="https://onecompiler.com/embed/java?theme=dark&listenToEvents=true&codeChangeEvent=true"
+                    width="100%"
+                    height="500px"
+                    style={{ border: "none", borderRadius: "8px" }}
+                    title="Java Online Compiler"
+                    onLoad={handleCompilerLoad}
+                  />
+                </Box>
+              ) : (
+                <>
+                  <Tabs
+                    value={tabValue}
+                    onChange={(_, val) => setTabValue(val)}
+                    sx={{ mb: 2 }}
+                  >
+                    <Tab label="📝 Code Editor" />
+                    <Tab label="🌐 Online Compiler" />
+                  </Tabs>
+
+                  {/* Tab 1: Monaco Code Editor */}
+                  {tabValue === 0 && (
+                    <Box>
+                      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+                        <Button
+                          variant="contained"
+                          startIcon={<PlayArrowIcon />}
+                          onClick={executeCode}
+                          disabled={isExecuting}
+                          sx={{
+                            background: `linear-gradient(135deg, ${languageColors[selectedLanguage]}, #00bcd4)`,
+                          }}
+                        >
+                          {isExecuting ? "Running..." : "Run Code"}
+                        </Button>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ alignSelf: "center" }}
+                        >
+                          Runs locally in browser
+                        </Typography>
+                      </Stack>
+
+                      <Stack direction="row" spacing={2}>
+                        <Box
+                          sx={{
+                            flex: 1,
+                            height: "400px",
+                            border: "1px solid #e0e0e0",
+                            borderRadius: 1,
+                            overflow: "hidden",
+                          }}
+                        >
+                          <Editor
+                            height="100%"
+                            language={languageMonacoIds[selectedLanguage]}
+                            value={submissionCode}
+                            onChange={(value) => setSubmissionCode(value || "")}
+                            theme="vs-light"
+                            options={{
+                              minimap: { enabled: false },
+                              fontSize: 14,
+                              lineNumbers: "on",
+                              scrollBeyondLastLine: false,
+                              automaticLayout: true,
+                            }}
+                          />
+                        </Box>
+                      </Stack>
+                    </Box>
+                  )}
+
+                  {/* Tab 2: Online Compiler */}
+                  {tabValue === 1 && (
+                    <Box>
+                      <iframe
+                        src={`https://onecompiler.com/embed/${selectedLanguage.toLowerCase()}?theme=dark`}
+                        width="100%"
+                        height="450px"
+                        style={{ border: "none", borderRadius: "8px" }}
+                        title="Online Compiler"
+                      />
+                    </Box>
+                  )}
+                </>
+              )}
+            </Grid>
+            <Grid size={{ xs: 12, md: 4 }}>
+              <Paper
+                variant="outlined"
                 sx={{
-                  mt: 1.5,
-                  p: 1.5,
-                  borderRadius: 1,
-                  backgroundColor: "#1e1e1e",
-                  color: submissionOutput.startsWith("❌")
-                    ? "#f44336"
-                    : "#4caf50",
-                  fontFamily: "monospace",
-                  fontSize: 13,
-                  whiteSpace: "pre-wrap",
-                  maxHeight: 150,
+                  p: { xs: 1.5, md: 2 },
+                  height: { md: "100%" },
+                  maxHeight: { md: 560 },
                   overflowY: "auto",
+                  backgroundColor: "#f8fafc",
                 }}
               >
-                {submissionOutput || "// Run your code to capture the output"}
-              </Box>
-            </Box>
-          ) : (
-            <>
-              <Tabs
-                value={tabValue}
-                onChange={(_, val) => setTabValue(val)}
-                sx={{ mb: 2 }}
-              >
-                <Tab label="📝 Code Editor" />
-                <Tab label="🌐 Online Compiler" />
-              </Tabs>
-
-              {/* Tab 1: Monaco Code Editor */}
-              {tabValue === 0 && (
-                <Box>
-                  <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-                    <Button
-                      variant="contained"
-                      startIcon={<PlayArrowIcon />}
-                      onClick={executeCode}
-                      disabled={isExecuting}
-                      sx={{
-                        background: `linear-gradient(135deg, ${languageColors[selectedLanguage]}, #00bcd4)`,
-                      }}
-                    >
-                      {isExecuting ? "Running..." : "Run Code"}
-                    </Button>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1 }}>
+                  Question
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: 600, lineHeight: 1.6 }}
+                >
+                  {typeof currentQuestion === "object"
+                    ? currentQuestion.question
+                    : currentQuestion}
+                </Typography>
+                {typeof currentQuestion === "object" &&
+                  currentQuestion.explanation && (
                     <Typography
                       variant="body2"
                       color="text.secondary"
-                      sx={{ alignSelf: "center" }}
+                      sx={{ mt: 1, lineHeight: 1.6 }}
                     >
-                      Runs locally in browser
+                      {currentQuestion.explanation}
                     </Typography>
-                  </Stack>
-
-                  <Stack direction="row" spacing={2}>
+                  )}
+                {typeof currentQuestion === "object" &&
+                  currentQuestion.pattern && (
+                    <Chip
+                      label={currentQuestion.pattern}
+                      size="small"
+                      variant="outlined"
+                      sx={{ mt: 1.25, maxWidth: "100%" }}
+                    />
+                  )}
+                {typeof currentQuestion === "object" &&
+                  currentQuestion.inputs && (
                     <Box
                       sx={{
-                        flex: 1,
-                        height: "400px",
-                        border: "1px solid #e0e0e0",
+                        mt: 1.5,
+                        p: 1,
                         borderRadius: 1,
-                        overflow: "hidden",
+                        backgroundColor: "#ffffff",
+                        border: "1px dashed rgba(0, 0, 0, 0.18)",
                       }}
                     >
-                      <Editor
-                        height="100%"
-                        language={languageMonacoIds[selectedLanguage]}
-                        value={submissionCode}
-                        onChange={(value) => setSubmissionCode(value || "")}
-                        theme="vs-light"
-                        options={{
-                          minimap: { enabled: false },
-                          fontSize: 14,
-                          lineNumbers: "on",
-                          scrollBeyondLastLine: false,
-                          automaticLayout: true,
-                        }}
-                      />
-                    </Box>
-
-                    <Box
-                      sx={{
-                        flex: 1,
-                        height: "400px",
-                        display: "flex",
-                        flexDirection: "column",
-                        border: "1px solid #e0e0e0",
-                        borderRadius: 1,
-                        overflow: "hidden",
-                      }}
-                    >
-                      <Box
+                      <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                        Sample Inputs
+                      </Typography>
+                      <Typography
+                        variant="body2"
                         sx={{
-                          px: 2,
-                          py: 1,
-                          backgroundColor: "#f0f0f0",
-                          borderBottom: "1px solid #e0e0e0",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Typography>📤 Output</Typography>
-                        {isExecuting && (
-                          <Typography variant="caption" color="text.secondary">
-                            Running...
-                          </Typography>
-                        )}
-                      </Box>
-                      <Box
-                        sx={{
-                          flex: 1,
-                          p: 2,
-                          backgroundColor: "#1e1e1e",
-                          color: submissionOutput.startsWith("❌")
-                            ? "#f44336"
-                            : "#4caf50",
+                          mt: 0.25,
                           fontFamily: "monospace",
-                          fontSize: "13px",
                           whiteSpace: "pre-wrap",
-                          overflowY: "auto",
+                          overflowWrap: "anywhere",
                         }}
                       >
-                        {isExecuting
-                          ? "⏳ Executing..."
-                          : submissionOutput ||
-                            "// Run your code to see output here"}
-                      </Box>
+                        {currentQuestion.inputs}
+                      </Typography>
                     </Box>
-                  </Stack>
+                  )}
+                {typeof currentQuestion === "object" &&
+                  currentQuestion.inputs && (
+                    <Box
+                      sx={{
+                        mt: 1,
+                        p: 1,
+                        borderRadius: 1,
+                        backgroundColor: "#f1f8ff",
+                        border: "1px dashed rgba(25, 118, 210, 0.24)",
+                      }}
+                    >
+                      <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                        Expected Output
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          mt: 0.25,
+                          fontFamily: "monospace",
+                          whiteSpace: "pre-wrap",
+                          overflowWrap: "anywhere",
+                        }}
+                      >
+                        {getExpectedOutput(currentQuestion)}
+                      </Typography>
+                    </Box>
+                  )}
+              </Paper>
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <Paper
+                variant="outlined"
+                sx={{ overflow: "hidden", backgroundColor: "#111827" }}
+              >
+                <Box
+                  sx={{
+                    px: 1.5,
+                    py: 0.75,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    backgroundColor: "#1f2937",
+                    borderBottom: "1px solid rgba(255,255,255,0.12)",
+                  }}
+                >
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ color: "#f9fafb", fontWeight: 700 }}
+                  >
+                    Console
+                  </Typography>
+                  {isExecuting && (
+                    <Typography variant="caption" sx={{ color: "#cbd5e1" }}>
+                      Running...
+                    </Typography>
+                  )}
                 </Box>
-              )}
-
-              {/* Tab 2: Online Compiler */}
-              {tabValue === 1 && (
-                <Box>
-                  <iframe
-                    src={`https://onecompiler.com/embed/${selectedLanguage.toLowerCase()}?theme=dark`}
-                    width="100%"
-                    height="450px"
-                    style={{ border: "none", borderRadius: "8px" }}
-                    title="Online Compiler"
-                  />
+                <Box
+                  sx={{
+                    p: 1.5,
+                    minHeight: 96,
+                    maxHeight: 160,
+                    overflowY: "auto",
+                    color: submissionOutput.startsWith("❌")
+                      ? "#f87171"
+                      : "#86efac",
+                    fontFamily: "monospace",
+                    fontSize: 13,
+                    whiteSpace: "pre-wrap",
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {isExecuting
+                    ? "Executing..."
+                    : submissionOutput || "Run your code to see output here."}
                 </Box>
-              )}
-            </>
-          )}
+              </Paper>
+            </Grid>
+          </Grid>
         </DialogContent>
 
         {submissionStatus && (
