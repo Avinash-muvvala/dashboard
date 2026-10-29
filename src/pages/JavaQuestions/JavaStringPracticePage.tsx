@@ -232,7 +232,7 @@ const JavaStringPracticePage = () => {
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 4 }}>
           <Paper sx={{ p: 2 }}>
-            <Stack direction="row" flexWrap="wrap" gap={0.75} sx={{ mb: 1.5 }}>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, mb: 1.5 }}>
               {(["All", "Easy", "Medium", "Hard"] as const).map(
                 (difficulty) => {
                   const color =
@@ -262,7 +262,7 @@ const JavaStringPracticePage = () => {
                   );
                 },
               )}
-            </Stack>
+            </Box>
 
             <TextField
               select
