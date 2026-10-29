@@ -262,14 +262,21 @@ const PracticeQuestionsDialog = ({
   if (!topics) return null;
 
   const practiceTopics = topics
-    .map((topic, index) => ({
-      topic,
-      day: index + 1,
-      questions: [
+    .map((topic, index) => {
+      const questions = [
         ...extractPostPracticeQuestions(topic.description),
         ...(SpringBootPracticeQuestions[index + 1] ?? []),
-      ],
-    }))
+      ];
+      const uniqueQuestions = Array.from(
+        new Map(
+          questions.map((question) => [
+            question.question.trim().toLowerCase(),
+            question,
+          ]),
+        ).values(),
+      );
+      return { topic, day: index + 1, questions: uniqueQuestions };
+    })
     .filter(({ questions }) => questions.length > 0);
 
   return (

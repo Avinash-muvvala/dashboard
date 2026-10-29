@@ -639,4 +639,18 @@ export const SpringBootPracticeQuestions: Record<
         "`FilterChainProxy` evaluates the configured request matchers of the registered `SecurityFilterChain` beans and uses the first matching chain.",
     },
   ],
+  149: [
+    {
+      question:
+        "Why should specific request authorization rules come before anyRequest().authenticated()?",
+      answer:
+        "Authorization rules are evaluated in declaration order. Put specific matchers, such as public or admin paths, before the catch-all rule so they can be applied as intended.",
+    },
+    {
+      question:
+        "When is disabling CSRF protection appropriate, and is CORS a replacement for it?",
+      answer:
+        "CSRF is generally kept enabled for cookie-based browser sessions. It may be disabled for a stateless API using a non-cookie token design, after considering the threat model. CORS controls cross-origin browser access and does not replace CSRF protection or authentication.",
+    },
+  ],
 };

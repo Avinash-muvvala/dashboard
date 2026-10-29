@@ -218,6 +218,19 @@ const additionalQuestions = {
         "It can help when application-wide state is complex or widely shared and is difficult to manage cleanly with local state, props, or Context alone.",
     },
   ],
+  38: [
+    {
+      question: "How can a protected route redirect an unauthenticated user?",
+      answer:
+        "A route guard can check authentication and render the requested page for signed-in users, or render React Router's `<Navigate>` to redirect others to a login route.",
+    },
+    {
+      question:
+        "What does BrowserRouter use to keep the URL and rendered page in sync?",
+      answer:
+        "BrowserRouter uses the browser's History API to update and respond to URLs while keeping navigation within the single-page application, without a full-page reload.",
+    },
+  ],
 } satisfies Record<number, { question: string; answer: string }[]>;
 
 export const ReactPracticeQuestions: Record<
