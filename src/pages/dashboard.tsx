@@ -1583,6 +1583,13 @@ sys.stderr = sys.__stderr__
             >
               Explore learning posts
             </Button>
+            <Button
+              // onClick={() => navigate("")}
+              startIcon={<LightbulbIcon />}
+              sx={{ mt: 1.5, color: "#26745a", fontWeight: 700 }}
+            >
+              Create Port Foilos
+            </Button>
           </Box>
 
           {/* <LearningPosts /> */}

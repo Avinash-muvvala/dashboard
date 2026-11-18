@@ -21,7 +21,7 @@ const theme = createTheme({
       main: "#348866",
     },
     background: {
-      default: "#f4f6f1",
+      default: "#f5f7f3",
       paper: "#ffffff",
     },
     text: {
@@ -35,10 +35,10 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 12,
   },
   typography: {
-    fontFamily: 'Manrope, "Segoe UI", sans-serif',
+    fontFamily: "var(--app-font)",
     fontSize: 14,
     h1: { fontSize: "2.1rem", lineHeight: 1.15, fontWeight: 800 },
     h2: { fontSize: "1.75rem", lineHeight: 1.2, fontWeight: 800 },
@@ -58,16 +58,19 @@ const theme = createTheme({
       styleOverrides: {
         body: {
           background:
-            "radial-gradient(circle at 12% 0%, rgba(203, 222, 205, 0.4), transparent 32%), radial-gradient(circle at 94% 22%, rgba(238, 218, 177, 0.24), transparent 28%), linear-gradient(180deg, #f4f6f1 0%, #f8f9f6 54%, #f1f4ef 100%)",
+            "radial-gradient(ellipse at 10% -8%, rgba(198, 221, 202, 0.42), transparent 38%), radial-gradient(ellipse at 96% 8%, rgba(238, 218, 177, 0.2), transparent 30%), linear-gradient(180deg, #f5f7f3 0%, #f9faf8 58%, #f2f5f1 100%)",
+          fontSize: "0.9rem",
+          lineHeight: 1.6,
         },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          paddingTop: 8,
-          paddingBottom: 8,
+          borderRadius: 10,
+          paddingTop: 9,
+          paddingBottom: 9,
+          fontWeight: 700,
           boxShadow: "none",
           transition:
             "background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease",
@@ -76,7 +79,7 @@ const theme = createTheme({
             transform: "translateY(-1px)",
           },
           "&:focus-visible": {
-            outline: "3px solid rgba(38, 116, 90, 0.35)",
+            outline: "3px solid rgba(38, 116, 90, 0.38)",
             outlineOffset: 2,
           },
         },
@@ -85,33 +88,71 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          border: "1px solid rgba(35, 66, 50, 0.12)",
-          boxShadow: "0 3px 14px rgba(31, 62, 45, 0.055)",
+          borderRadius: 14,
+          border: "1px solid #e1e8e2",
+          boxShadow: "0 5px 20px rgba(31, 62, 45, 0.055)",
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          border: "1px solid rgba(35, 66, 50, 0.12)",
+          borderRadius: 12,
+          border: "1px solid #e1e8e2",
         },
       },
     },
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 6,
+          borderRadius: 7,
           fontWeight: 700,
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 10,
+          backgroundColor: "#ffffff",
+          transition: "box-shadow 160ms ease, border-color 160ms ease",
+          "&.Mui-focused": {
+            boxShadow: "0 0 0 3px rgba(38, 116, 90, 0.12)",
+          },
+        },
+      },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        indicator: {
+          height: 3,
+          borderRadius: 999,
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          minHeight: 44,
+          fontWeight: 700,
+          textTransform: "none",
+        },
+      },
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          borderRadius: 7,
+          fontSize: "0.75rem",
+          fontWeight: 600,
         },
       },
     },
     MuiDialog: {
       styleOverrides: {
         paper: {
-          borderRadius: 10,
-          border: "1px solid rgba(35, 66, 50, 0.12)",
+          borderRadius: 14,
+          border: "1px solid #e1e8e2",
           boxShadow: "0 18px 55px rgba(31, 62, 45, 0.16)",
         },
       },

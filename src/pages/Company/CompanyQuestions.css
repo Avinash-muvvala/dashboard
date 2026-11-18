@@ -2,8 +2,9 @@
   max-width: 100%;
   overflow: hidden;
   background: #fff;
-  border-radius: 3px;
-  box-shadow: 0 12px 32px rgba(24, 56, 43, 0.16);
+  border: 1px solid #e1e8e2;
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(24, 56, 43, 0.12);
   animation: company-page-enter 180ms ease-out both;
 }
 
@@ -32,8 +33,8 @@
 
 @media (max-width: 600px) {
   .company-pdf-page {
-    border-radius: 2px;
-    box-shadow: 0 6px 18px rgba(24, 56, 43, 0.14);
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(24, 56, 43, 0.1);
   }
 }
 
