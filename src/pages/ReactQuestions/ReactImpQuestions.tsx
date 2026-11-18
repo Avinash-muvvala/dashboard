@@ -59,7 +59,7 @@ const ReactImpQuestions = () => {
           </Typography>
         </Box>
 
-        <Button
+        {/* <Button
           variant="outlined"
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate("/Dashboard")}
@@ -79,7 +79,7 @@ const ReactImpQuestions = () => {
           }}
         >
           Back to Dashboard
-        </Button>
+        </Button> */}
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate(-1)}

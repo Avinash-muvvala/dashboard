@@ -413,15 +413,22 @@ const ReactPosts = () => {
                 pb: { xs: 0.5, md: 0 },
               }}
             >
-              {ReactTopics.map((_, index) => {
+              {ReactTopics.map((topic, index) => {
                 const day = index + 1;
+                const topicTitle = topic.title.replace(
+                  /^[^\w]*Day[\s-]*\d+:\s*/i,
+                  "",
+                );
 
                 return (
                   <Button
                     key={day}
                     onClick={() => scrollToDay(day)}
                     aria-current={activeDay === day ? "page" : undefined}
+                    title={topicTitle}
                     sx={{
+                      flexDirection: "column",
+                      alignItems: "flex-start",
                       justifyContent: "flex-start",
                       flexShrink: 0,
                       width: { xs: "auto", md: "100%" },
@@ -443,7 +450,33 @@ const ReactPosts = () => {
                       },
                     }}
                   >
-                    Day {day}
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontSize: "0.9rem",
+                        fontWeight: activeDay === day ? 800 : 700,
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      Day {day}
+                    </Typography>
+                    <Typography
+                      component="span"
+                      sx={{
+                        display: { xs: "none", md: "block" },
+                        width: "100%",
+                        mt: 0.25,
+                        fontSize: "0.74rem",
+                        fontWeight: 500,
+                        lineHeight: 1.3,
+                        opacity: 0.8,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {topicTitle}
+                    </Typography>
                   </Button>
                 );
               })}

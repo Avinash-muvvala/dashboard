@@ -478,7 +478,7 @@ const SpringBootPage = () => {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "150px minmax(0, 860px)" },
+            gridTemplateColumns: { xs: "1fr", md: "220px minmax(0, 860px)" },
             justifyContent: "center",
             alignItems: "start",
             gap: { xs: 2, md: 4 },
@@ -500,18 +500,25 @@ const SpringBootPage = () => {
               scrollbarWidth: "thin",
             }}
           >
-            {importantSpringTopicsData.map((_, index) => {
+            {importantSpringTopicsData.map((topic, index) => {
               const day = index + 1;
+              const topicTitle = topic.title.replace(
+                /^[^\w]*Day[\s-]*\d+:\s*/i,
+                "",
+              );
               return (
                 <Button
                   key={day}
-                  aria-label={`Go to day ${day}`}
+                  aria-label={`Go to day ${day}: ${topicTitle}`}
                   aria-current={activeDay === day ? "step" : undefined}
                   onClick={() => scrollToDay(day)}
+                  title={topicTitle}
                   sx={{
                     flex: { xs: "0 0 auto", md: "initial" },
                     minWidth: { xs: 58, md: 0 },
                     justifyContent: "flex-start",
+                    alignItems: "flex-start",
+                    flexDirection: "column",
                     px: 1.25,
                     py: 0.8,
                     borderRadius: 1.5,
@@ -536,7 +543,33 @@ const SpringBootPage = () => {
                     },
                   }}
                 >
-                  Day {day}
+                  <Typography
+                    component="span"
+                    sx={{
+                      fontSize: "0.88rem",
+                      fontWeight: 800,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    Day {day}
+                  </Typography>
+                  <Typography
+                    component="span"
+                    sx={{
+                      display: { xs: "none", md: "block" },
+                      width: "100%",
+                      mt: 0.25,
+                      fontSize: "0.72rem",
+                      fontWeight: 500,
+                      lineHeight: 1.3,
+                      opacity: 0.8,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {topicTitle}
+                  </Typography>
                 </Button>
               );
             })}

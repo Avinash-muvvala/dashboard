@@ -9,13 +9,17 @@ const pdfMap: Record<string, { label: string; file: string }> = {
     file: "/pdfs/DesginPatterns.pdf",
   },
   SpringBoot: { label: "Spring / Spring Boot", file: "/pdfs/SpringBoot.pdf" },
-  Hibernate: {
-    label: "Hibernate / JPA",
-    file: "/pdfs/Java_Interview_Questions.pdf",
+  Multithreading: {
+    label: "Multithreading",
+    file: "/pdfs/Multithreading_Questions.pdf",
   },
   Microservices: {
     label: "Microservices",
     file: "/pdfs/Microservices_Interview_Questions_Organized.pdf",
+  },
+  Hibernate: {
+    label: "Hibernate / JPA",
+    file: "/pdfs/Hibernate.pdf",
   },
   SpringSecurity: {
     label: "SpringSecurity",

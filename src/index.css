@@ -141,3 +141,12 @@ svg {
     width: max-content;
     max-width: calc(var(--nl-vw, 100vw) - 26px);
 }
+
+.nl-wrap {
+    display: none;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    width: max-content;
+    max-width: calc(var(--nl-vw, 100vw) - 26px);
+}

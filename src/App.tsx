@@ -41,7 +41,7 @@ const ReactImpQuestionsPage = lazy(
 );
 const ReactPosts = lazy(() => import("./pages/REACTPOSTS/ReactPosts"));
 const CompanyQuestions = lazy(() => import("./pages/Company/CompanyQuestions"));
-const LearningPage = lazy(() => import("./pages/LearningPage"));
+const LearningPage = lazy(() => import("./pages/Learning/LearningPage"));
 const SqlPracticePage = lazy(() => import("./pages/SQL/SqlPracticePage"));
 const JavaStreamsPracticePage = lazy(
   () => import("./pages/JavaQuestions/JavaStreamsPracticePage"),

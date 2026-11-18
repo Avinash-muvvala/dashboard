@@ -3,8 +3,8 @@ import {
   Box,
   Button,
   Card,
+  CardActionArea,
   CardContent,
-  CardMedia,
   Alert,
   Chip,
   Container,
@@ -21,6 +21,7 @@ import {
   Typography,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CodeIcon from "@mui/icons-material/Code";
 import HistoryIcon from "@mui/icons-material/History";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -176,28 +177,16 @@ const difficultyColors: Record<DifficultyType, string> = {
   Hard: "#c62828",
 };
 
-const createLanguageImage = (label: string, backgroundColor: string) => {
-  const svg = `
-  <svg width="500" height="200" viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
-    <rect width="500" height="200" rx="24" ry="24" fill="${backgroundColor}" />
-    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-family="Inter, sans-serif" font-size="36" font-weight="700">${label}</text>
-    <text x="50%" y="72%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-family="Inter, sans-serif" font-size="18" opacity="0.85">Daily coding challenge</text>
-  </svg>
-  `;
-
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-};
-
-const languageImages: Record<LanguageType, string> = {
-  Java: createLanguageImage("Java", "#007396"),
-  Python: createLanguageImage("Python", "#3776AB"),
-  JavaScript: createLanguageImage("JavaScript", "#F7DF1E"),
-};
-
 const languageColors: Record<LanguageType, string> = {
   Java: "#007396",
   Python: "#3776AB",
   JavaScript: "#F7DF1E",
+};
+
+const languageDescriptions: Record<LanguageType, string> = {
+  Java: "Strengthen your fundamentals with focused daily problems.",
+  Python: "Practice clear, expressive solutions one challenge at a time.",
+  JavaScript: "Build confidence with practical language challenges.",
 };
 
 const languageTemplates: Record<LanguageType, string> = {
@@ -645,6 +634,12 @@ const Dashboard = () => {
     return completedTasks.filter((task) => task.language === language).length;
     // This is fine as-is since each unique day+taskIndex combo = 1 entry after fix
   };
+
+  const getLanguageTaskCount = (language: LanguageType) =>
+    Object.values(questionsByLanguage[language]).reduce(
+      (total, dayQuestions) => total + dayQuestions.length,
+      0,
+    );
 
   const closeCompiler = () => {
     if (isSubmitting) return;
@@ -1319,125 +1314,280 @@ sys.stderr = sys.__stderr__
             </Stack>
           </Box>
 
-          {/* Language Selection Cards */}
-          <Box>
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 700, mb: 1.5, fontSize: "1rem" }}
+          {!hasSelectedLanguage && (
+            <Paper
+              elevation={0}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "1.5fr 1fr" },
+                alignItems: "center",
+                gap: { xs: 3, md: 5 },
+                p: { xs: 2.5, sm: 3.5, md: 4.5 },
+                color: "#fff",
+                background:
+                  "linear-gradient(115deg, #173f35 0%, #245a46 64%, #356c4f 100%)",
+                borderRadius: 2,
+                overflow: "hidden",
+              }}
             >
-              Select Your Language
-            </Typography>
-
-            <Grid container spacing={1.5}>
-              {languages.map((language) => (
-                <Grid key={language} size={{ xs: 6, sm: 4, md: 3 }}>
-                  <Card
-                    onClick={() => {
-                      setSelectedLanguage(language);
-                      setSelectedDay("Day 1");
-                      setSelectedDifficulty(null);
-                      setHasSelectedLanguage(true);
-                      setHasSelectedDay(false);
-                      setIsRevisionMode(false);
-                      setIsStreamsMode(false);
-                    }}
-                    sx={{
-                      cursor: "pointer",
-                      transition: "all 0.35s ease",
-                      transform:
-                        selectedLanguage === language
-                          ? "scale(1.03)"
-                          : "scale(1)",
-                      border:
-                        selectedLanguage === language
-                          ? `2px solid ${languageColors[language]}`
-                          : "1px solid rgba(15, 23, 42, 0.12)",
-                      boxShadow:
-                        selectedLanguage === language
-                          ? `0 16px 40px ${languageColors[language]}22`
-                          : "0 10px 30px rgba(15, 23, 42, 0.06)",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <CardMedia
-                      component="img"
-                      height="76"
-                      image={languageImages[language]}
-                      alt={language}
-                    />
-                    <CardContent sx={{ p: "10px 12px !important" }}>
-                      <Typography
-                        variant="body2"
-                        sx={{ fontWeight: 700, mb: 0.5 }}
-                      >
-                        {language}
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 0.75,
-                        }}
-                      >
-                        <LinearProgress
-                          variant="determinate"
-                          value={
-                            getTotalCompletedCount(language) > 0
-                              ? Math.round(
-                                  (getTotalCompletedCount(language) / 45) * 100,
-                                )
-                              : 0
-                          }
-                          sx={{ flex: 1, height: 6, borderRadius: 3 }}
-                        />
-                        <Typography variant="body2" sx={{ minWidth: "40px" }}>
-                          {getTotalCompletedCount(language)}/15
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-
-              <Grid size={{ xs: 6, sm: 4, md: 3 }}>
-                <Card
-                  onClick={() => navigate("/learning")}
+              <Box>
+                <Chip
+                  label="YOUR NEXT CHAPTER STARTS HERE"
+                  size="small"
                   sx={{
-                    cursor: "pointer",
-                    height: "100%",
-                    transition: "all 0.35s ease",
-                    border: "1px solid rgba(15, 23, 42, 0.12)",
-                    boxShadow: "0 10px 30px rgba(15, 23, 42, 0.06)",
-                    overflow: "hidden",
-                    "&:hover": {
-                      transform: "scale(1.03)",
-                      boxShadow: "0 16px 40px rgba(0, 0, 0, 0.12)",
-                    },
+                    mb: 1.5,
+                    color: "#f6d18b",
+                    bgcolor: "rgba(255,255,255,0.1)",
+                    fontWeight: 700,
+                    letterSpacing: 0.4,
+                  }}
+                />
+                <Typography
+                  variant="h3"
+                  sx={{
+                    maxWidth: 620,
+                    fontWeight: 800,
+                    lineHeight: 1.08,
+                    fontSize: { xs: "2rem", sm: "2.6rem", md: "3rem" },
                   }}
                 >
-                  <CardMedia
-                    component="img"
-                    height="76"
-                    image={createLanguageImage("Learning", "#5e35b1")}
-                    alt="Learning"
-                  />
-                  <CardContent sx={{ p: "10px 12px !important" }}>
+                  Turn a little practice into real progress.
+                </Typography>
+                <Typography
+                  sx={{
+                    mt: 1.5,
+                    maxWidth: 560,
+                    color: "rgba(255,255,255,0.78)",
+                    fontSize: { xs: "0.95rem", sm: "1rem" },
+                  }}
+                >
+                  Take on focused coding challenges, build your problem-solving
+                  skills, and keep track of what you have completed. Choose a
+                  language to begin.
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                  borderTop: { xs: "1px solid rgba(255,255,255,0.2)", md: 0 },
+                  pt: { xs: 2, md: 0 },
+                }}
+              >
+                {[
+                  ["03", "languages"],
+                  ["45", "practice days"],
+                  ["03", "difficulty levels"],
+                ].map(([value, label], index) => (
+                  <Box
+                    key={label}
+                    sx={{
+                      pl: index === 0 ? 0 : { xs: 1.25, sm: 2 },
+                      borderLeft:
+                        index === 0 ? 0 : "1px solid rgba(255,255,255,0.2)",
+                    }}
+                  >
                     <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 700, mb: 0.5 }}
+                      sx={{
+                        fontSize: { xs: "1.5rem", sm: "2rem" },
+                        fontWeight: 800,
+                      }}
                     >
-                      Learning Posts
+                      {value}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Java, Spring Boot, React, HTML/CSS
+                    <Typography
+                      sx={{
+                        color: "rgba(255,255,255,0.72)",
+                        fontSize: { xs: "0.68rem", sm: "0.78rem" },
+                      }}
+                    >
+                      {label}
                     </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
+                  </Box>
+                ))}
+              </Box>
+            </Paper>
+          )}
 
-              {/* <LearningPosts /> */}
+          {/* Language Selection Cards */}
+          <Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "end",
+                gap: 1,
+                mb: 1.5,
+              }}
+            >
+              <Box>
+                <Typography
+                  variant="overline"
+                  sx={{ color: "#26745a", fontWeight: 800, lineHeight: 1.2 }}
+                >
+                  01 / Choose your track
+                </Typography>
+                <Typography
+                  variant="h5"
+                  sx={{ fontWeight: 800, mt: 0.25, fontSize: "1.35rem" }}
+                >
+                  Pick a language to get started
+                </Typography>
+              </Box>
+            </Box>
 
-              {/* <Grid size={{ xs: 6, sm: 4, md: 3 }}>
+            <Grid container spacing={2}>
+              {languages.map((language) => {
+                const completedCount = getTotalCompletedCount(language);
+                const totalTaskCount = getLanguageTaskCount(language);
+                const isSelected =
+                  hasSelectedLanguage && selectedLanguage === language;
+
+                return (
+                  <Grid key={language} size={{ xs: 12, sm: 6, md: 4 }}>
+                    <Card
+                      sx={{
+                        height: "100%",
+                        border: isSelected
+                          ? `2px solid ${languageColors[language]}`
+                          : "1px solid rgba(35, 66, 50, 0.14)",
+                        boxShadow: isSelected
+                          ? `0 12px 30px ${languageColors[language]}26`
+                          : "0 8px 24px rgba(35, 66, 50, 0.06)",
+                        transition:
+                          "transform 180ms ease, box-shadow 180ms ease",
+                        "&:hover": {
+                          transform: "translateY(-3px)",
+                          boxShadow: "0 14px 30px rgba(35, 66, 50, 0.12)",
+                        },
+                      }}
+                    >
+                      <CardActionArea
+                        onClick={() => {
+                          setSelectedLanguage(language);
+                          setSelectedDay("Day 1");
+                          setSelectedDifficulty(null);
+                          setHasSelectedLanguage(true);
+                          setHasSelectedDay(false);
+                          setIsRevisionMode(false);
+                          setIsStreamsMode(false);
+                        }}
+                        aria-label={`Start ${language} practice`}
+                        sx={{ height: "100%", p: { xs: 2, sm: 2.5 } }}
+                      >
+                        <CardContent sx={{ p: "0 !important" }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "flex-start",
+                              justifyContent: "space-between",
+                              gap: 2,
+                            }}
+                          >
+                            <Box>
+                              <Typography
+                                variant="overline"
+                                sx={{
+                                  color: "text.secondary",
+                                  fontWeight: 800,
+                                  lineHeight: 1.2,
+                                }}
+                              >
+                                DAILY PRACTICE
+                              </Typography>
+                              <Typography
+                                variant="h5"
+                                sx={{ fontWeight: 800, mt: 0.5 }}
+                              >
+                                {language}
+                              </Typography>
+                            </Box>
+                            <Box
+                              sx={{
+                                width: 44,
+                                height: 44,
+                                flexShrink: 0,
+                                display: "grid",
+                                placeItems: "center",
+                                borderRadius: 1.5,
+                                color:
+                                  language === "JavaScript"
+                                    ? "#332b12"
+                                    : languageColors[language],
+                                bgcolor:
+                                  language === "JavaScript"
+                                    ? "#f7df1e"
+                                    : `${languageColors[language]}16`,
+                              }}
+                            >
+                              <CodeIcon />
+                            </Box>
+                          </Box>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ minHeight: 44, mt: 1, lineHeight: 1.55 }}
+                          >
+                            {languageDescriptions[language]}
+                          </Typography>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                              mt: 2,
+                            }}
+                          >
+                            <LinearProgress
+                              variant="determinate"
+                              value={
+                                totalTaskCount > 0
+                                  ? Math.min(
+                                      100,
+                                      Math.round(
+                                        (completedCount / totalTaskCount) * 100,
+                                      ),
+                                    )
+                                  : 0
+                              }
+                              sx={{
+                                flex: 1,
+                                height: 6,
+                                borderRadius: 3,
+                                bgcolor: "rgba(35, 66, 50, 0.1)",
+                                "& .MuiLinearProgress-bar": {
+                                  bgcolor: languageColors[language],
+                                },
+                              }}
+                            />
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ whiteSpace: "nowrap" }}
+                            >
+                              {completedCount}/{totalTaskCount} done
+                            </Typography>
+                          </Box>
+                        </CardContent>
+                      </CardActionArea>
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
+
+            <Button
+              onClick={() => navigate("/learning")}
+              startIcon={<LightbulbIcon />}
+              sx={{ mt: 1.5, color: "#26745a", fontWeight: 700 }}
+            >
+              Explore learning posts
+            </Button>
+          </Box>
+
+          {/* <LearningPosts /> */}
+
+          {/* <Grid size={{ xs: 6, sm: 4, md: 3 }}>
                 <Card
                   onClick={() => navigate("/JavaImpTopicsPage")}
                   sx={{
@@ -1811,7 +1961,7 @@ sys.stderr = sys.__stderr__
                   </Typography>
                 </Card>
               </Grid> */}
-              {/* <Grid size={{ xs: 6, sm: 4, md: 3 }}>
+          {/* <Grid size={{ xs: 6, sm: 4, md: 3 }}>
                 <Card
                   onClick={() => navigate("/react-guide")}
                   sx={{
@@ -1918,11 +2068,21 @@ sys.stderr = sys.__stderr__
                   </Typography>
                 </Card>
               </Grid> */}
-            </Grid>
-          </Box>
 
           {hasSelectedLanguage && (
             <>
+              <Button
+                variant="text"
+                startIcon={<ArrowBackIcon />}
+                onClick={() => {
+                  setHasSelectedLanguage(false);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                sx={{ alignSelf: "flex-start", color: "text.secondary" }}
+              >
+                Back to language selection
+              </Button>
+
               {/* Day Selection */}
               <Paper
                 sx={{

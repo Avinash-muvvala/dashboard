@@ -1,11 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { PDFDocumentProxy } from "pdfjs-dist";
 import {
   Alert,
   Box,
   Button,
-  Card,
-  CardActionArea,
-  CardContent,
   CircularProgress,
   Collapse,
   Container,
@@ -41,19 +39,32 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
-type InterviewItem = {
+type CompanyInterviewItem = {
   id: string;
   title: string;
   subtitle: string;
   fileName: string;
-  questionCount?: number;
-  startPage?: number;
-  endPage?: number;
+  questionCount: number;
+  startPage: number;
+  endPage: number;
   number?: string;
   accent: string;
   tint: string;
-  kind: "company" | "document";
+  kind: "company";
 };
+
+type DocumentInterviewItem = {
+  id: string;
+  title: string;
+  subtitle: string;
+  fileName: string;
+  number?: string;
+  accent: string;
+  tint: string;
+  kind: "document";
+};
+
+type InterviewItem = CompanyInterviewItem | DocumentInterviewItem;
 
 type InterviewQuestion = {
   id: string;
@@ -144,12 +155,15 @@ const extractPageQuestions = (
   return questions;
 };
 
-const companyPdfName = "Java_Interview_Questions_By_Company.pdf";
-const companyPdf = documents.find(
-  (document) => document.fileName === companyPdfName,
-);
+type CompanySection = {
+  title: string;
+  subtitle: string;
+  questionCount: number;
+  startPage: number;
+  endPage: number;
+};
 
-const companySections = [
+const fallbackCompanySections: CompanySection[] = [
   {
     title: "Capgemini",
     subtitle: "Java Backend Interview",
@@ -208,6 +222,148 @@ const companySections = [
   },
 ];
 
+const normalizeCompanyHeading = (value: string) =>
+  value
+    .replace(/^[^A-Za-z0-9]+/, "")
+    .replace(/\s+/g, " ")
+    .replace(/[\u2013\u2014]/g, "-")
+    .trim();
+
+const COMPANY_NAME_WHITELIST = new Set([
+  "Capgemini",
+  "Honeywell",
+  "Wissen",
+  "EPAM",
+  "Production Scenarios",
+  "Deloitte",
+  "Coforge",
+  "Optum",
+  "Accenture",
+  "TCS",
+  "Infosys",
+  "Cognizant",
+  "Microsoft",
+  "Amazon",
+  "Google",
+  "Meta",
+  "Uber",
+  "PayPal",
+  "Nagarro",
+  "Persistent",
+  "IBM",
+  "Mphasis",
+  "Hexaware",
+  "Virtusa",
+  "Tech Mahindra",
+  "HCL",
+  "LTIMindtree",
+  "Mindtree",
+  "JPMorgan",
+  "Goldman Sachs",
+  "Barclays",
+  "Flipkart",
+  "Myntra",
+]);
+
+const isLikelyCompanyHeading = (value: string) => {
+  const cleaned = normalizeCompanyHeading(value);
+  const lowered = cleaned.toLowerCase();
+
+  if (!cleaned || cleaned.length < 3 || cleaned.length > 60) return false;
+
+  if (COMPANY_NAME_WHITELIST.has(cleaned)) return true;
+
+  const genericPatterns = [
+    "java interview",
+    "interview question",
+    "interview questions",
+    "questions and answers",
+    "question bank",
+    "company interview",
+    "key areas",
+    "page ",
+    "experience",
+    "round",
+    "java ",
+    "company",
+  ];
+
+  if (genericPatterns.some((pattern) => lowered.includes(pattern)))
+    return false;
+  if (
+    /^(?:java|interview|questions|answers|round|experience|key areas|page|company)$/i.test(
+      cleaned,
+    )
+  ) {
+    return false;
+  }
+  if (/\d{4}/.test(cleaned) || /^\d/.test(cleaned)) return false;
+
+  const looksLikeCompanyName =
+    /^[A-Z][A-Za-z0-9&./()'-]*(?:\s+[A-Z][A-Za-z0-9&./()'-]*)+$/.test(
+      cleaned,
+    ) || /^[A-Z][A-Za-z0-9&./()'-]+$/.test(cleaned);
+
+  return looksLikeCompanyName && /[A-Za-z]/.test(cleaned);
+};
+
+const extractCompanySectionsFromPdf = async (
+  pdf: PDFDocumentProxy,
+): Promise<CompanySection[]> => {
+  const totalPages = pdf.numPages || 1;
+  const detected: Array<{ title: string; startPage: number }> = [];
+  const pageQuestionCounts: number[] = [];
+
+  for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
+    const page = await pdf.getPage(pageNumber);
+    const textContent = await page.getTextContent();
+    const pageItems = textContent.items as PdfTextItem[];
+    const pageLines = pageItems
+      .map((item) => item.str?.trim())
+      .filter((line): line is string => Boolean(line));
+    pageQuestionCounts[pageNumber] = extractPageQuestions(
+      pageItems,
+      pageNumber,
+    ).length;
+
+    const heading = pageLines.find((line) => isLikelyCompanyHeading(line));
+    if (!heading) continue;
+
+    const title = normalizeCompanyHeading(heading);
+    if (!title) continue;
+    detected.push({ title, startPage: pageNumber });
+  }
+
+  if (detected.length === 0) return fallbackCompanySections;
+
+  const sections: CompanySection[] = [];
+  detected.forEach((entry, index) => {
+    const nextSection = detected[index + 1];
+    const endPage = nextSection ? nextSection.startPage - 1 : totalPages;
+    const questionCount = pageQuestionCounts
+      .slice(entry.startPage, endPage + 1)
+      .reduce((total, count) => total + count, 0);
+    sections.push({
+      title: entry.title,
+      subtitle: "Java interview questions",
+      questionCount,
+      startPage: entry.startPage,
+      endPage,
+    });
+  });
+
+  return sections.filter((section) => section.endPage >= section.startPage);
+};
+
+const companyPdfName = "Java_Interview_Questions_By_Company.pdf";
+const companyPdf =
+  documents.find(
+    (document) =>
+      document.fileName.toLowerCase() === companyPdfName.toLowerCase(),
+  ) ??
+  documents.find((document) => /company/i.test(document.fileName)) ??
+  null;
+
 const accents = [
   { accent: "#c65b3b", tint: "#fff0e9" },
   { accent: "#27745e", tint: "#e8f4ee" },
@@ -215,42 +371,22 @@ const accents = [
   { accent: "#39739a", tint: "#eaf3f9" },
 ];
 
-const interviewItems: InterviewItem[] = [
-  ...(companyPdf
-    ? companySections.map((section, index) => ({
-        ...section,
-        id: `company-${section.title}`,
-        fileName: companyPdf.fileName,
-        number: String(index + 1).padStart(2, "0"),
-        ...accents[index % accents.length],
-        kind: "company" as const,
-      }))
-    : []),
-  ...documents
-    .filter((document) => document.fileName !== companyPdfName)
-    .map((document, index) => ({
-      id: `document-${document.fileName}`,
-      title: document.title,
-      subtitle: "PDF resource · questions and answers",
-      fileName: document.fileName,
-      ...accents[(index + 1) % accents.length],
-      kind: "document" as const,
-    })),
-];
-
 const CompanyQuestions = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [pdfPageCount, setPdfPageCount] = useState(0);
   const [pageWidth, setPageWidth] = useState(760);
+  const [companySections, setCompanySections] = useState<CompanySection[]>(
+    fallbackCompanySections,
+  );
   const [questionResult, setQuestionResult] = useState<{
     key: string;
     questions: InterviewQuestion[];
     error?: string;
   } | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [showAllQuestions, setShowAllQuestions] = useState(false);
   const [expandedQuestionId, setExpandedQuestionId] = useState<string | null>(
     null,
   );
@@ -260,12 +396,42 @@ const CompanyQuestions = () => {
   const [answerErrors, setAnswerErrors] = useState<Record<string, string>>({});
   const [loadingAnswerId, setLoadingAnswerId] = useState<string | null>(null);
   const viewerRef = useRef<HTMLDivElement>(null);
+  const interviewItems = useMemo(
+    () => [
+      ...(companyPdf
+        ? companySections.map((section, index) => ({
+            ...section,
+            id: `company-${section.title}`,
+            fileName: companyPdf.fileName,
+            number: String(index + 1).padStart(2, "0"),
+            ...accents[index % accents.length],
+            kind: "company" as const,
+          }))
+        : []),
+      ...documents
+        .filter((document) => document.fileName !== companyPdf?.fileName)
+        .map((document, index) => ({
+          id: `document-${document.fileName}`,
+          title: document.title,
+          subtitle: "PDF resource · questions and answers",
+          fileName: document.fileName,
+          ...accents[(index + 1) % accents.length],
+          kind: "document" as const,
+        })),
+    ],
+    [companySections],
+  );
+
   const selectedItem = interviewItems.find((item) => item.id === selectedId);
   const selectedDocument = selectedItem
     ? documents.find((document) => document.fileName === selectedItem.fileName)
     : null;
   const pdfUrl = selectedDocument
     ? `${import.meta.env.BASE_URL}Company/${encodeURIComponent(selectedDocument.fileName)}`
+    : null;
+
+  const companyPdfUrl = companyPdf
+    ? `${import.meta.env.BASE_URL}Company/${encodeURIComponent(companyPdf.fileName)}`
     : null;
   const selectedCompanyId =
     selectedItem?.kind === "company" ? selectedItem.id : null;
@@ -280,8 +446,14 @@ const CompanyQuestions = () => {
       item.kind === "document" &&
       `${item.title} ${item.fileName}`.toLowerCase().includes(searchValue),
   );
-  const firstPage = selectedItem?.startPage ?? 1;
-  const lastPage = selectedItem?.endPage ?? (pdfPageCount || 1);
+  const firstPage =
+    selectedItem && selectedItem.kind === "company"
+      ? selectedItem.startPage
+      : 1;
+  const lastPage =
+    selectedItem && selectedItem.kind === "company"
+      ? selectedItem.endPage
+      : pdfPageCount || 1;
   const questionSetKey =
     selectedCompanyId && pdfUrl
       ? `${selectedCompanyId}:${pdfUrl}:${firstPage}-${lastPage}`
@@ -289,17 +461,66 @@ const CompanyQuestions = () => {
   const activeQuestionResult =
     questionResult?.key === questionSetKey ? questionResult : null;
   const interviewQuestions = activeQuestionResult?.questions ?? [];
-  const currentQuestion = interviewQuestions[currentQuestionIndex];
+  const actualQuestionCount = interviewQuestions.length;
+  const safeCurrentQuestionIndex =
+    interviewQuestions.length === 0
+      ? 0
+      : Math.min(currentQuestionIndex, interviewQuestions.length - 1);
+  const currentQuestion = interviewQuestions[safeCurrentQuestionIndex];
   const questionsLoading = Boolean(questionSetKey && !activeQuestionResult);
   const questionsError = activeQuestionResult?.error ?? "";
-  const displayedPage = Math.max(firstPage, Math.min(currentPage, lastPage));
-  const totalQuestions = companySections.reduce(
-    (total, section) => total + section.questionCount,
-    0,
-  );
+  const getItemQuestionCount = (item: InterviewItem) => {
+    if (item.kind !== "company") return 0;
+    if (selectedCompanyId === item.id && actualQuestionCount > 0) {
+      return actualQuestionCount;
+    }
+    return item.questionCount;
+  };
+  const totalQuestions =
+    selectedItem && selectedItem.kind === "company" && actualQuestionCount
+      ? actualQuestionCount
+      : companySections.reduce(
+          (total, section) => total + section.questionCount,
+          0,
+        );
   const selectedCompanyIndex = visibleCompanies.findIndex(
     (item) => item.id === selectedId,
   );
+
+  useEffect(() => {
+    if (!companyPdf || !companyPdfUrl) {
+      queueMicrotask(() => {
+        setCompanySections(fallbackCompanySections);
+      });
+      return;
+    }
+
+    let cancelled = false;
+    const loadingTask = pdfjs.getDocument({ url: companyPdfUrl });
+
+    void (async () => {
+      try {
+        const pdf = await loadingTask.promise;
+        const detectedSections = await extractCompanySectionsFromPdf(pdf);
+        if (!cancelled) {
+          queueMicrotask(() => {
+            setCompanySections(detectedSections);
+          });
+        }
+      } catch {
+        if (!cancelled) {
+          queueMicrotask(() => {
+            setCompanySections(fallbackCompanySections);
+          });
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      void loadingTask.destroy();
+    };
+  }, [companyPdfUrl]);
 
   useEffect(() => {
     if (!selectedId) return;
@@ -336,17 +557,21 @@ const CompanyQuestions = () => {
         }
 
         if (!cancelled) {
-          setQuestionResult({
-            key: questionSetKey,
-            questions: extractedQuestions,
+          queueMicrotask(() => {
+            setQuestionResult({
+              key: questionSetKey,
+              questions: extractedQuestions,
+            });
           });
         }
       } catch {
         if (!cancelled) {
-          setQuestionResult({
-            key: questionSetKey,
-            questions: [],
-            error: "We couldn't read the questions from this PDF.",
+          queueMicrotask(() => {
+            setQuestionResult({
+              key: questionSetKey,
+              questions: [],
+              error: "We couldn't read the questions from this PDF.",
+            });
           });
         }
       }
@@ -376,9 +601,9 @@ const CompanyQuestions = () => {
 
   const selectInterview = (item: InterviewItem) => {
     setSelectedId(item.id);
-    setCurrentPage(item.startPage ?? 1);
     setPdfPageCount(0);
     setCurrentQuestionIndex(0);
+    setShowAllQuestions(false);
     setExpandedQuestionId(null);
   };
 
@@ -455,7 +680,10 @@ const CompanyQuestions = () => {
   // }, []);
 
   const moveToQuestion = (index: number) => {
-    setCurrentQuestionIndex(index);
+    if (interviewQuestions.length === 0) return;
+    setCurrentQuestionIndex(
+      Math.max(0, Math.min(index, interviewQuestions.length - 1)),
+    );
     setExpandedQuestionId(null);
   };
 
@@ -463,126 +691,87 @@ const CompanyQuestions = () => {
     const selected = item.id === selectedId;
 
     return (
-      <Grid key={item.id} size={{ xs: 12, sm: 6, lg: 4 }}>
-        <Card
-          variant="outlined"
+      <Box key={item.id} sx={{ width: "100%" }}>
+        <Button
+          fullWidth
+          onClick={() => selectInterview(item)}
+          aria-pressed={selected}
           sx={{
-            height: "100%",
-            minHeight: 172,
-            borderWidth: selected ? 2 : 1,
-            borderColor: selected ? item.accent : "rgba(24, 56, 43, 0.13)",
-            backgroundColor: selected ? item.tint : "#ffffff",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 1.5,
+            px: 1.5,
+            py: 1.25,
+            mb: 0.75,
             borderRadius: 1,
-            transition:
-              "transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease",
-            animation: "interview-rise 420ms ease both",
-            animationDelay: `${Math.min(Number(item.number ?? 1), 8) * 35}ms`,
+            border: selected
+              ? `1px solid ${item.accent}`
+              : "1px solid rgba(24, 56, 43, 0.08)",
+            backgroundColor: selected ? item.tint : "#ffffff",
+            color: "#173f34",
+            textTransform: "none",
+            boxShadow: selected ? "0 8px 20px rgba(22, 62, 45, 0.06)" : "none",
+            transition: "all 180ms ease",
             "&:hover": {
-              transform: "translateY(-3px)",
-              boxShadow: "0 12px 28px rgba(22, 62, 45, 0.1)",
-            },
-            "&:focus-within": {
-              outline: `3px solid ${item.accent}55`,
-              outlineOffset: 2,
+              backgroundColor: selected ? item.tint : "#f4f8f4",
             },
           }}
         >
-          <CardActionArea
-            onClick={() => selectInterview(item)}
-            aria-pressed={selected}
-            sx={{ height: "100%" }}
+          <Stack
+            direction="row"
+            spacing={1.25}
+            sx={{ alignItems: "center", minWidth: 0 }}
           >
-            <CardContent sx={{ p: { xs: 2, sm: 2.25 } }}>
-              <Stack
-                direction="row"
-                spacing={1.5}
-                sx={{ alignItems: "flex-start" }}
-              >
-                <Box
-                  sx={{
-                    width: 42,
-                    height: 42,
-                    flexShrink: 0,
-                    borderRadius: 1.5,
-                    display: "grid",
-                    placeItems: "center",
-                    color: item.accent,
-                    backgroundColor: item.tint,
-                  }}
-                >
-                  {item.kind === "company" ? (
-                    <BusinessCenterOutlinedIcon />
-                  ) : (
-                    <ArticleOutlinedIcon />
-                  )}
-                </Box>
-                <Box sx={{ minWidth: 0, flex: 1 }}>
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    sx={{
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontSize: "1rem",
-                        fontWeight: 750,
-                        lineHeight: 1.25,
-                      }}
-                    >
-                      {item.title}
-                    </Typography>
-                    {item.number && (
-                      <Typography
-                        variant="caption"
-                        sx={{ color: item.accent, fontWeight: 800 }}
-                      >
-                        {item.number}
-                      </Typography>
-                    )}
-                  </Stack>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mt: 0.5, minHeight: 40, lineHeight: 1.45 }}
-                  >
-                    {item.subtitle}
-                  </Typography>
-                </Box>
-              </Stack>
-              <Stack
-                direction="row"
+            <Box
+              sx={{
+                width: 30,
+                height: 30,
+                borderRadius: 1,
+                display: "grid",
+                placeItems: "center",
+                color: item.accent,
+                backgroundColor: item.tint,
+                fontSize: 14,
+                flexShrink: 0,
+              }}
+            >
+              {item.kind === "company" ? (
+                <BusinessCenterOutlinedIcon fontSize="small" />
+              ) : (
+                <ArticleOutlinedIcon fontSize="small" />
+              )}
+            </Box>
+            <Box sx={{ textAlign: "left", minWidth: 0 }}>
+              <Typography
+                variant="body2"
                 sx={{
-                  mt: 2,
-                  pt: 1.25,
-                  borderTop: "1px solid rgba(24, 56, 43, 0.1)",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  fontWeight: 750,
+                  lineHeight: 1.3,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                 }}
               >
-                <Typography
-                  variant="caption"
-                  sx={{ color: item.accent, fontWeight: 750 }}
-                >
-                  {item.questionCount
-                    ? `${item.questionCount} questions`
-                    : "Open PDF resource"}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {item.startPage && item.endPage
-                    ? item.startPage === item.endPage
-                      ? `Page ${item.startPage}`
-                      : `Pages ${item.startPage}-${item.endPage}`
-                    : "View document"}
-                </Typography>
-              </Stack>
-            </CardContent>
-          </CardActionArea>
-        </Card>
-      </Grid>
+                {item.title}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {item.kind === "company" && getItemQuestionCount(item)
+                  ? `${getItemQuestionCount(item)} questions`
+                  : "PDF resource"}
+              </Typography>
+            </Box>
+          </Stack>
+
+          {item.number && (
+            <Typography
+              variant="caption"
+              sx={{ color: item.accent, fontWeight: 800 }}
+            >
+              {item.number}
+            </Typography>
+          )}
+        </Button>
+      </Box>
     );
   };
 
@@ -805,577 +994,853 @@ const CompanyQuestions = () => {
           </Stack>
         </Stack>
 
-        {visibleCompanies.length > 0 && (
-          <Box
-            component="section"
-            aria-labelledby="company-list-heading"
-            sx={{ mb: 3.5 }}
-          >
-            <Stack
-              direction="row"
-              sx={{
-                mb: 1.25,
-                alignItems: "baseline",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography
-                id="company-list-heading"
-                variant="h6"
-                sx={{ color: "#173f34", fontWeight: 800 }}
+        {selectedItem && pdfUrl ? (
+          <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
+            <Grid size={{ xs: 12, lg: 4 }}>
+              <Box
+                sx={{
+                  position: { xs: "relative", lg: "sticky" },
+                  top: { lg: 16 },
+                  height: { xs: "42vh", lg: "75vh" },
+                  maxHeight: { xs: "42vh", lg: "75vh" },
+                  overflowY: "auto",
+                  pr: 0.5,
+                  pb: 1,
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "#a7b9aa transparent",
+                  "&::-webkit-scrollbar": { width: 8 },
+                  "&::-webkit-scrollbar-thumb": {
+                    borderRadius: 8,
+                    backgroundColor: "#a7b9aa",
+                  },
+                }}
               >
-                Company interview sets
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {visibleCompanies.length} available
-              </Typography>
-            </Stack>
-            <Grid container spacing={{ xs: 1.25, sm: 1.75 }}>
-              {visibleCompanies.map(renderInterviewCard)}
-            </Grid>
-          </Box>
-        )}
+                {visibleCompanies.length > 0 && (
+                  <Box
+                    component="section"
+                    aria-labelledby="company-list-heading"
+                    sx={{ mb: 3.5 }}
+                  >
+                    <Stack
+                      direction="row"
+                      sx={{
+                        mb: 1.25,
+                        alignItems: "baseline",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography
+                        id="company-list-heading"
+                        variant="h6"
+                        sx={{ color: "#173f34", fontWeight: 800 }}
+                      >
+                        Questions Asked by Companies
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {visibleCompanies.length} available
+                      </Typography>
+                    </Stack>
+                    <Grid container spacing={{ xs: 1.25, sm: 1.75 }}>
+                      {visibleCompanies.map(renderInterviewCard)}
+                    </Grid>
+                  </Box>
+                )}
 
-        {visibleDocuments.length > 0 && (
-          <Box
-            component="section"
-            aria-labelledby="pdf-list-heading"
-            sx={{ mb: 3.5 }}
-          >
-            <Stack
-              direction="row"
-              sx={{
-                mb: 1.25,
-                alignItems: "baseline",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography
-                id="pdf-list-heading"
-                variant="h6"
-                sx={{ color: "#173f34", fontWeight: 800 }}
+                {visibleDocuments.length > 0 && (
+                  <Box
+                    component="section"
+                    aria-labelledby="pdf-list-heading"
+                    sx={{ mb: 1.5 }}
+                  >
+                    <Stack
+                      direction="row"
+                      sx={{
+                        mb: 1.25,
+                        alignItems: "baseline",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography
+                        id="pdf-list-heading"
+                        variant="h6"
+                        sx={{ color: "#173f34", fontWeight: 800 }}
+                      >
+                        More PDF resources
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Added from the Company folder
+                      </Typography>
+                    </Stack>
+                    <Grid container spacing={{ xs: 1.25, sm: 1.75 }}>
+                      {visibleDocuments.map(renderInterviewCard)}
+                    </Grid>
+                  </Box>
+                )}
+
+                {visibleCompanies.length === 0 &&
+                  visibleDocuments.length === 0 && (
+                    <Box sx={{ py: 6, textAlign: "center" }}>
+                      <Typography
+                        variant="h6"
+                        sx={{ color: "#173f34", fontWeight: 750 }}
+                      >
+                        No matching interviews
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 0.5 }}
+                      >
+                        Try another company name or clear your search.
+                      </Typography>
+                    </Box>
+                  )}
+              </Box>
+            </Grid>
+
+            <Grid size={{ xs: 12, lg: 8 }}>
+              <Box
+                id="company-document-viewer"
+                component="section"
+                aria-labelledby="selected-interview-title"
+                sx={{
+                  scrollMarginTop: 20,
+                  overflow: "hidden",
+                  border: "1px solid rgba(24, 56, 43, 0.13)",
+                  borderRadius: 1,
+                  backgroundColor: "#ffffff",
+                  boxShadow: "0 20px 56px rgba(24, 56, 43, 0.12)",
+                }}
               >
-                More PDF resources
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Added from the Company folder
-              </Typography>
-            </Stack>
-            <Grid container spacing={{ xs: 1.25, sm: 1.75 }}>
-              {visibleDocuments.map(renderInterviewCard)}
-            </Grid>
-          </Box>
-        )}
-
-        {visibleCompanies.length === 0 && visibleDocuments.length === 0 && (
-          <Box sx={{ py: 6, textAlign: "center" }}>
-            <Typography variant="h6" sx={{ color: "#173f34", fontWeight: 750 }}>
-              No matching interviews
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              Try another company name or clear your search.
-            </Typography>
-          </Box>
-        )}
-
-        {selectedItem && pdfUrl && (
-          <Box
-            id="company-document-viewer"
-            component="section"
-            aria-labelledby="selected-interview-title"
-            sx={{
-              mt: 4,
-              scrollMarginTop: 20,
-              overflow: "hidden",
-              border: "1px solid rgba(24, 56, 43, 0.13)",
-              borderRadius: 1,
-              backgroundColor: "#ffffff",
-              boxShadow: "0 20px 56px rgba(24, 56, 43, 0.12)",
-            }}
-          >
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={1.5}
-              sx={{
-                p: { xs: 2, sm: 2.5 },
-                borderBottom: "1px solid rgba(24, 56, 43, 0.1)",
-                alignItems: { xs: "stretch", sm: "center" },
-                justifyContent: "space-between",
-              }}
-            >
-              <Box>
-                <Typography
-                  variant="overline"
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={1.5}
                   sx={{
-                    color: selectedItem.accent,
-                    fontWeight: 800,
-                    lineHeight: 1.5,
+                    p: { xs: 2, sm: 2.5 },
+                    borderBottom: "1px solid rgba(24, 56, 43, 0.1)",
+                    alignItems: { xs: "stretch", sm: "center" },
+                    justifyContent: "space-between",
                   }}
                 >
-                  {selectedItem.kind === "company"
-                    ? "COMPANY INTERVIEW"
-                    : "PDF RESOURCE"}
-                </Typography>
-                <Typography
-                  id="selected-interview-title"
-                  variant="h5"
-                  sx={{ color: "#173f34", fontWeight: 800, lineHeight: 1.2 }}
+                  <Box>
+                    <Typography
+                      variant="overline"
+                      sx={{
+                        color: selectedItem.accent,
+                        fontWeight: 800,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {selectedItem.kind === "company"
+                        ? "COMPANY INTERVIEW"
+                        : "PDF RESOURCE"}
+                    </Typography>
+                    <Typography
+                      id="selected-interview-title"
+                      variant="h5"
+                      sx={{
+                        color: "#173f34",
+                        fontWeight: 800,
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {selectedItem.title}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mt: 0.4 }}
+                    >
+                      {selectedItem.subtitle}
+                      {selectedItem.kind === "company" && actualQuestionCount
+                        ? ` · ${actualQuestionCount} questions`
+                        : selectedItem.kind === "company" &&
+                            selectedItem.questionCount
+                          ? ` · ${selectedItem.questionCount} questions`
+                          : ""}
+                    </Typography>
+                  </Box>
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="outlined"
+                      onClick={() => setSelectedId(null)}
+                      sx={{ textTransform: "none" }}
+                    >
+                      All interviews
+                    </Button>
+                    <Button
+                      href={pdfUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      variant="contained"
+                      endIcon={<OpenInNewIcon />}
+                      sx={{
+                        textTransform: "none",
+                        bgcolor: "#216d56",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      Open PDF
+                    </Button>
+                  </Stack>
+                </Stack>
+
+                {selectedItem.kind === "document" && (
+                  <Box
+                    ref={viewerRef}
+                    sx={{
+                      minHeight: { xs: 360, sm: 520 },
+                      maxHeight: "78vh",
+                      overflow: "auto",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "flex-start",
+                      p: { xs: 1.5, sm: 3 },
+                      backgroundColor: "#e9eee8",
+                    }}
+                  >
+                    <Document
+                      key={selectedItem.fileName}
+                      file={pdfUrl}
+                      onLoadSuccess={({ numPages }) =>
+                        setPdfPageCount(numPages)
+                      }
+                      loading={
+                        <Stack
+                          spacing={1.5}
+                          sx={{ py: 8, color: "#27745e", alignItems: "center" }}
+                        >
+                          <CircularProgress color="inherit" />
+                          <Typography variant="body2">
+                            Opening interview pages...
+                          </Typography>
+                        </Stack>
+                      }
+                      error={
+                        <Typography color="error" sx={{ py: 8 }}>
+                          This PDF could not be opened. Use “Open PDF” to try
+                          your browser’s viewer.
+                        </Typography>
+                      }
+                    >
+                      <Stack
+                        spacing={2}
+                        sx={{ width: "100%", alignItems: "center" }}
+                      >
+                        {Array.from({ length: pdfPageCount }, (_, index) => (
+                          <Page
+                            key={`${selectedItem.fileName}-${index + 1}`}
+                            pageNumber={index + 1}
+                            width={pageWidth}
+                            renderTextLayer
+                            renderAnnotationLayer
+                            loading={<CircularProgress sx={{ m: 8 }} />}
+                            canvasBackground="#ffffff"
+                            className="company-pdf-page"
+                          />
+                        ))}
+                      </Stack>
+                    </Document>
+                  </Box>
+                )}
+
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={1.25}
+                  sx={{
+                    p: { xs: 1.5, sm: 2 },
+                    borderTop: "1px solid rgba(24, 56, 43, 0.1)",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
                 >
-                  {selectedItem.title}
+                  <Button
+                    startIcon={<KeyboardArrowLeftIcon />}
+                    onClick={() => changeCompany(-1)}
+                    disabled={
+                      selectedItem.kind !== "company" ||
+                      selectedCompanyIndex <= 0
+                    }
+                    sx={{
+                      textTransform: "none",
+                      alignSelf: { xs: "stretch", sm: "auto" },
+                    }}
+                  >
+                    Previous interview
+                  </Button>
+                  <Stack
+                    direction="row"
+                    spacing={1.5}
+                    sx={{ alignItems: "center" }}
+                  >
+                    {selectedItem.kind === "document" && pdfPageCount > 0 && (
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          minWidth: 112,
+                          textAlign: "center",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {pdfPageCount} pages · Scroll to read
+                      </Typography>
+                    )}
+                  </Stack>
+                  <Button
+                    endIcon={<KeyboardArrowRightIcon />}
+                    onClick={() => changeCompany(1)}
+                    disabled={
+                      selectedItem.kind !== "company" ||
+                      selectedCompanyIndex < 0 ||
+                      selectedCompanyIndex >= visibleCompanies.length - 1
+                    }
+                    sx={{
+                      textTransform: "none",
+                      alignSelf: { xs: "stretch", sm: "auto" },
+                    }}
+                  >
+                    Next interview
+                  </Button>
+                </Stack>
+
+                {selectedItem.kind === "company" && (
+                  <Box
+                    component="section"
+                    aria-label="Interview questions"
+                    sx={{
+                      p: { xs: 2, sm: 3 },
+                      borderTop: "1px solid rgba(24, 56, 43, 0.1)",
+                    }}
+                  >
+                    {!questionsLoading &&
+                      !questionsError &&
+                      interviewQuestions.length > 0 && (
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          sx={{ mb: 1.25, justifyContent: "space-between" }}
+                        >
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ alignSelf: "center" }}
+                          >
+                            {interviewQuestions.length} questions
+                          </Typography>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() =>
+                              setShowAllQuestions((showing) => !showing)
+                            }
+                            sx={{ textTransform: "none", whiteSpace: "nowrap" }}
+                          >
+                            {showAllQuestions
+                              ? "Hide all questions"
+                              : "Show all questions"}
+                          </Button>
+                        </Stack>
+                      )}
+
+                    {showAllQuestions &&
+                      !questionsLoading &&
+                      !questionsError &&
+                      interviewQuestions.length > 0 && (
+                        <Paper
+                          variant="outlined"
+                          aria-label="All company questions"
+                          sx={{
+                            mb: 1.25,
+                            p: 1,
+                            maxHeight: 340,
+                            overflowY: "auto",
+                            borderRadius: 1,
+                            borderColor: "rgba(35, 66, 50, 0.16)",
+                            boxShadow: "none",
+                          }}
+                        >
+                          <Stack spacing={0.5}>
+                            {interviewQuestions.map((question, index) => (
+                              <Button
+                                key={question.id}
+                                fullWidth
+                                variant={
+                                  index === safeCurrentQuestionIndex
+                                    ? "contained"
+                                    : "text"
+                                }
+                                onClick={() => moveToQuestion(index)}
+                                sx={{
+                                  justifyContent: "flex-start",
+                                  alignItems: "flex-start",
+                                  gap: 1,
+                                  px: 1.25,
+                                  py: 1,
+                                  color:
+                                    index === safeCurrentQuestionIndex
+                                      ? "#ffffff"
+                                      : "#1c2b24",
+                                  textAlign: "left",
+                                  textTransform: "none",
+                                  whiteSpace: "normal",
+                                  lineHeight: 1.5,
+                                  backgroundColor:
+                                    index === safeCurrentQuestionIndex
+                                      ? "#27745e"
+                                      : "transparent",
+                                  "&:hover": {
+                                    backgroundColor:
+                                      index === safeCurrentQuestionIndex
+                                        ? "#1f604d"
+                                        : "#f1f6f0",
+                                  },
+                                }}
+                              >
+                                <Box
+                                  component="span"
+                                  sx={{ flexShrink: 0, fontWeight: 800 }}
+                                >
+                                  {index + 1}.
+                                </Box>
+                                <Box component="span">{question.text}</Box>
+                              </Button>
+                            ))}
+                          </Stack>
+                        </Paper>
+                      )}
+
+                    {questionsLoading ? (
+                      <Stack
+                        direction="row"
+                        spacing={1.25}
+                        sx={{ py: 2, alignItems: "center" }}
+                      >
+                        <CircularProgress size={20} />
+                        <Typography variant="body2" color="text.secondary">
+                          Reading questions from the PDF...
+                        </Typography>
+                      </Stack>
+                    ) : questionsError ? (
+                      <Alert severity="warning">{questionsError}</Alert>
+                    ) : !currentQuestion ? (
+                      <Typography variant="body2" color="text.secondary">
+                        No numbered questions were found in this company's PDF
+                        pages.
+                      </Typography>
+                    ) : (
+                      <Paper
+                        variant="outlined"
+                        sx={{
+                          p: { xs: 2, sm: 2.5 },
+                          borderRadius: 1,
+                          borderColor: "rgba(35, 66, 50, 0.16)",
+                          boxShadow: "none",
+                        }}
+                      >
+                        <Stack
+                          direction={{ xs: "column", sm: "row" }}
+                          spacing={2}
+                          sx={{
+                            alignItems: { xs: "stretch", sm: "center" },
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Box sx={{ flex: 1 }}>
+                            <Typography
+                              variant="overline"
+                              sx={{ color: "#26745a", fontWeight: 800 }}
+                            >
+                              Question {safeCurrentQuestionIndex + 1} of{" "}
+                              {actualQuestionCount || interviewQuestions.length}
+                            </Typography>
+                            <Typography
+                              variant="h6"
+                              sx={{
+                                mt: 0.5,
+                                color: "#1c2b24",
+                                fontWeight: 700,
+                                lineHeight: 1.55,
+                              }}
+                            >
+                              {currentQuestion.text}
+                            </Typography>
+                          </Box>
+                          <Button
+                            size="small"
+                            variant={
+                              answers[currentQuestion.id]
+                                ? "outlined"
+                                : "contained"
+                            }
+                            startIcon={
+                              loadingAnswerId === currentQuestion.id ? (
+                                <CircularProgress size={14} />
+                              ) : (
+                                <AutoAwesomeIcon fontSize="small" />
+                              )
+                            }
+                            disabled={loadingAnswerId !== null}
+                            aria-expanded={
+                              expandedQuestionId === currentQuestion.id
+                            }
+                            onClick={() =>
+                              void toggleSimpleAnswer(currentQuestion)
+                            }
+                            sx={{
+                              flexShrink: 0,
+                              alignSelf: { xs: "flex-start", sm: "center" },
+                              whiteSpace: "nowrap",
+                              textTransform: "none",
+                              ...(answers[currentQuestion.id]
+                                ? {}
+                                : {
+                                    backgroundColor: "#27745e",
+                                    boxShadow: "none",
+                                    "&:hover": {
+                                      backgroundColor: "#1f604d",
+                                      boxShadow: "none",
+                                    },
+                                  }),
+                            }}
+                          >
+                            {answers[currentQuestion.id]
+                              ? expandedQuestionId === currentQuestion.id
+                                ? "Hide answer"
+                                : "Show answer"
+                              : loadingAnswerId === currentQuestion.id
+                                ? "Writing answer..."
+                                : "Show simple answer"}
+                          </Button>
+                        </Stack>
+
+                        <Collapse
+                          in={expandedQuestionId === currentQuestion.id}
+                        >
+                          {(answers[currentQuestion.id] ||
+                            answerErrors[currentQuestion.id] ||
+                            loadingAnswerId === currentQuestion.id) && (
+                            <Box
+                              sx={{
+                                mt: 2,
+                                p: { xs: 1.5, sm: 2 },
+                                borderRadius: 1,
+                                backgroundColor: "#f1f6f0",
+                              }}
+                            >
+                              {loadingAnswerId === currentQuestion.id && (
+                                <Stack
+                                  direction="row"
+                                  spacing={1}
+                                  sx={{ alignItems: "center" }}
+                                >
+                                  <CircularProgress size={16} />
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
+                                    Writing a simple explanation...
+                                  </Typography>
+                                </Stack>
+                              )}
+                              {answers[currentQuestion.id] && (
+                                <Stack spacing={2}>
+                                  <Box
+                                    sx={{
+                                      p: { xs: 1.5, sm: 2 },
+                                      borderLeft: "3px solid #26745a",
+                                      borderRadius: "0 6px 6px 0",
+                                      backgroundColor: "#ffffff",
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="overline"
+                                      sx={{
+                                        color: "#26745a",
+                                        fontWeight: 800,
+                                      }}
+                                    >
+                                      Interview-ready answer
+                                    </Typography>
+                                    <Typography
+                                      variant="body1"
+                                      sx={{
+                                        mt: 0.5,
+                                        color: "#1c2b24",
+                                        fontWeight: 650,
+                                        lineHeight: 1.7,
+                                      }}
+                                    >
+                                      {
+                                        answers[currentQuestion.id]
+                                          .interviewAnswer
+                                      }
+                                    </Typography>
+                                  </Box>
+
+                                  <Box>
+                                    <Typography
+                                      variant="subtitle2"
+                                      sx={{ color: "#26745a", fontWeight: 800 }}
+                                    >
+                                      In simple words
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{
+                                        mt: 0.35,
+                                        color: "#34483d",
+                                        lineHeight: 1.7,
+                                      }}
+                                    >
+                                      {
+                                        answers[currentQuestion.id]
+                                          .simpleExplanation
+                                      }
+                                    </Typography>
+                                  </Box>
+
+                                  {answers[currentQuestion.id].example && (
+                                    <Box
+                                      sx={{
+                                        p: { xs: 1.5, sm: 2 },
+                                        borderRadius: 1,
+                                        backgroundColor: "#fff8e9",
+                                      }}
+                                    >
+                                      <Typography
+                                        variant="subtitle2"
+                                        sx={{
+                                          color: "#9a671d",
+                                          fontWeight: 800,
+                                        }}
+                                      >
+                                        Example
+                                      </Typography>
+                                      <Typography
+                                        variant="body2"
+                                        sx={{
+                                          mt: 0.35,
+                                          color: "#493c2a",
+                                          lineHeight: 1.7,
+                                        }}
+                                      >
+                                        {answers[currentQuestion.id].example}
+                                      </Typography>
+                                    </Box>
+                                  )}
+
+                                  <Box
+                                    sx={{
+                                      pt: 1.25,
+                                      borderTop:
+                                        "1px solid rgba(35, 66, 50, 0.12)",
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="subtitle2"
+                                      sx={{ color: "#26745a", fontWeight: 800 }}
+                                    >
+                                      Key takeaway
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      sx={{
+                                        mt: 0.35,
+                                        color: "#34483d",
+                                        lineHeight: 1.7,
+                                      }}
+                                    >
+                                      {answers[currentQuestion.id].keyTakeaway}
+                                    </Typography>
+                                  </Box>
+                                </Stack>
+                              )}
+                              {answerErrors[currentQuestion.id] && (
+                                <Alert severity="warning" sx={{ py: 0 }}>
+                                  {answerErrors[currentQuestion.id]}
+                                </Alert>
+                              )}
+                            </Box>
+                          )}
+                        </Collapse>
+                      </Paper>
+                    )}
+                    {!questionsLoading &&
+                      !questionsError &&
+                      currentQuestion && (
+                        <Paper
+                          variant="outlined"
+                          sx={{
+                            mt: 1.25,
+                            p: { xs: 1.5, sm: 2 },
+                            borderRadius: 1,
+                            borderColor: "rgba(35, 66, 50, 0.16)",
+                            backgroundColor: "#f7faf6",
+                            boxShadow: "none",
+                          }}
+                        >
+                          <Stack
+                            direction={{ xs: "column", sm: "row" }}
+                            spacing={1.25}
+                            sx={{
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ fontWeight: 700 }}
+                            >
+                              Question {safeCurrentQuestionIndex + 1} of{" "}
+                              {actualQuestionCount || interviewQuestions.length}
+                              <Box
+                                component="span"
+                                sx={{ ml: 1, fontWeight: 400 }}
+                              >
+                                · No. {currentQuestion.number}
+                              </Box>
+                            </Typography>
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              sx={{ width: { xs: "100%", sm: "auto" } }}
+                            >
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                startIcon={<KeyboardArrowLeftIcon />}
+                                disabled={
+                                  safeCurrentQuestionIndex === 0 ||
+                                  loadingAnswerId !== null
+                                }
+                                onClick={() =>
+                                  moveToQuestion(safeCurrentQuestionIndex - 1)
+                                }
+                                sx={{
+                                  flex: { xs: 1, sm: "0 0 auto" },
+                                  textTransform: "none",
+                                }}
+                              >
+                                Previous
+                              </Button>
+                              <Button
+                                size="small"
+                                variant="contained"
+                                endIcon={<KeyboardArrowRightIcon />}
+                                disabled={
+                                  safeCurrentQuestionIndex >=
+                                    interviewQuestions.length - 1 ||
+                                  loadingAnswerId !== null
+                                }
+                                onClick={() =>
+                                  moveToQuestion(safeCurrentQuestionIndex + 1)
+                                }
+                                sx={{
+                                  flex: { xs: 1, sm: "0 0 auto" },
+                                  textTransform: "none",
+                                  whiteSpace: "nowrap",
+                                  backgroundColor: "#27745e",
+                                  boxShadow: "none",
+                                  "&:hover": {
+                                    backgroundColor: "#1f604d",
+                                    boxShadow: "none",
+                                  },
+                                }}
+                              >
+                                Next question
+                              </Button>
+                            </Stack>
+                          </Stack>
+                        </Paper>
+                      )}
+                  </Box>
+                )}
+              </Box>
+            </Grid>
+          </Grid>
+        ) : (
+          <>
+            {visibleCompanies.length > 0 && (
+              <Box
+                component="section"
+                aria-labelledby="company-list-heading"
+                sx={{ mb: 3.5 }}
+              >
+                <Stack
+                  direction="row"
+                  sx={{
+                    mb: 1.25,
+                    alignItems: "baseline",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Typography
+                    id="company-list-heading"
+                    variant="h6"
+                    sx={{ color: "#173f34", fontWeight: 800 }}
+                  >
+                    Questions Asked by Companies
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {visibleCompanies.length} available
+                  </Typography>
+                </Stack>
+                <Grid container spacing={{ xs: 1.25, sm: 1.75 }}>
+                  {visibleCompanies.map(renderInterviewCard)}
+                </Grid>
+              </Box>
+            )}
+
+            {visibleDocuments.length > 0 && (
+              <Box
+                component="section"
+                aria-labelledby="pdf-list-heading"
+                sx={{ mb: 3.5 }}
+              >
+                <Stack
+                  direction="row"
+                  sx={{
+                    mb: 1.25,
+                    alignItems: "baseline",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Typography
+                    id="pdf-list-heading"
+                    variant="h6"
+                    sx={{ color: "#173f34", fontWeight: 800 }}
+                  >
+                    More PDF resources
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Added from the Company folder
+                  </Typography>
+                </Stack>
+                <Grid container spacing={{ xs: 1.25, sm: 1.75 }}>
+                  {visibleDocuments.map(renderInterviewCard)}
+                </Grid>
+              </Box>
+            )}
+
+            {visibleCompanies.length === 0 && visibleDocuments.length === 0 && (
+              <Box sx={{ py: 6, textAlign: "center" }}>
+                <Typography
+                  variant="h6"
+                  sx={{ color: "#173f34", fontWeight: 750 }}
+                >
+                  No matching interviews
                 </Typography>
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ mt: 0.4 }}
+                  sx={{ mt: 0.5 }}
                 >
-                  {selectedItem.subtitle}
-                  {selectedItem.questionCount
-                    ? ` · ${selectedItem.questionCount} questions`
-                    : ""}
+                  Try another company name or clear your search.
                 </Typography>
-              </Box>
-              <Stack direction="row" spacing={1}>
-                <Button
-                  variant="outlined"
-                  onClick={() => setSelectedId(null)}
-                  sx={{ textTransform: "none" }}
-                >
-                  All interviews
-                </Button>
-                <Button
-                  href={pdfUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  variant="contained"
-                  endIcon={<OpenInNewIcon />}
-                  sx={{
-                    textTransform: "none",
-                    bgcolor: "#216d56",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  Open PDF
-                </Button>
-              </Stack>
-            </Stack>
-
-            <Box
-              ref={viewerRef}
-              sx={{
-                minHeight: { xs: 360, sm: 520 },
-                maxHeight: "78vh",
-                overflow: "auto",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "flex-start",
-                p: { xs: 1.5, sm: 3 },
-                backgroundColor: "#e9eee8",
-              }}
-            >
-              <Document
-                key={selectedItem.fileName}
-                file={pdfUrl}
-                onLoadSuccess={({ numPages }) => setPdfPageCount(numPages)}
-                loading={
-                  <Stack
-                    spacing={1.5}
-                    sx={{ py: 8, color: "#27745e", alignItems: "center" }}
-                  >
-                    <CircularProgress color="inherit" />
-                    <Typography variant="body2">
-                      Opening interview pages...
-                    </Typography>
-                  </Stack>
-                }
-                error={
-                  <Typography color="error" sx={{ py: 8 }}>
-                    This PDF could not be opened. Use “Open PDF” to try your
-                    browser’s viewer.
-                  </Typography>
-                }
-              >
-                <Page
-                  pageNumber={displayedPage}
-                  width={pageWidth}
-                  renderTextLayer
-                  renderAnnotationLayer
-                  loading={<CircularProgress sx={{ m: 8 }} />}
-                  canvasBackground="#ffffff"
-                  className="company-pdf-page"
-                />
-              </Document>
-            </Box>
-
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={1.25}
-              sx={{
-                p: { xs: 1.5, sm: 2 },
-                borderTop: "1px solid rgba(24, 56, 43, 0.1)",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Button
-                startIcon={<KeyboardArrowLeftIcon />}
-                onClick={() => changeCompany(-1)}
-                disabled={
-                  selectedItem.kind !== "company" || selectedCompanyIndex <= 0
-                }
-                sx={{
-                  textTransform: "none",
-                  alignSelf: { xs: "stretch", sm: "auto" },
-                }}
-              >
-                Previous interview
-              </Button>
-              <Stack
-                direction="row"
-                spacing={1.5}
-                sx={{ alignItems: "center" }}
-              >
-                <Button
-                  aria-label="Previous PDF page"
-                  onClick={() =>
-                    setCurrentPage((page) => Math.max(firstPage, page - 1))
-                  }
-                  disabled={displayedPage <= firstPage}
-                  sx={{ minWidth: 40 }}
-                >
-                  <KeyboardArrowLeftIcon />
-                </Button>
-                <Typography
-                  variant="body2"
-                  sx={{ minWidth: 112, textAlign: "center", fontWeight: 700 }}
-                >
-                  Page {displayedPage} of {lastPage}
-                </Typography>
-                <Button
-                  aria-label="Next PDF page"
-                  onClick={() =>
-                    setCurrentPage((page) => Math.min(lastPage, page + 1))
-                  }
-                  disabled={displayedPage >= lastPage}
-                  sx={{ minWidth: 40 }}
-                >
-                  <KeyboardArrowRightIcon />
-                </Button>
-              </Stack>
-              <Button
-                endIcon={<KeyboardArrowRightIcon />}
-                onClick={() => changeCompany(1)}
-                disabled={
-                  selectedItem.kind !== "company" ||
-                  selectedCompanyIndex < 0 ||
-                  selectedCompanyIndex >= visibleCompanies.length - 1
-                }
-                sx={{
-                  textTransform: "none",
-                  alignSelf: { xs: "stretch", sm: "auto" },
-                }}
-              >
-                Next interview
-              </Button>
-            </Stack>
-
-            {selectedItem.kind === "company" && (
-              <Box
-                component="section"
-                aria-labelledby="interview-questions-heading"
-                sx={{
-                  p: { xs: 2, sm: 3 },
-                  borderTop: "1px solid rgba(24, 56, 43, 0.1)",
-                }}
-              >
-                <Box sx={{ mb: 2 }}>
-                  <Typography
-                    id="interview-questions-heading"
-                    variant="h6"
-                    sx={{ color: "#173f34", fontWeight: 800 }}
-                  >
-                    Interview questions
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Ask Gemini for a short, beginner-friendly explanation of any
-                    question.
-                  </Typography>
-                </Box>
-
-                {questionsLoading ? (
-                  <Stack
-                    direction="row"
-                    spacing={1.25}
-                    sx={{ py: 2, alignItems: "center" }}
-                  >
-                    <CircularProgress size={20} />
-                    <Typography variant="body2" color="text.secondary">
-                      Reading questions from the PDF...
-                    </Typography>
-                  </Stack>
-                ) : questionsError ? (
-                  <Alert severity="warning">{questionsError}</Alert>
-                ) : !currentQuestion ? (
-                  <Typography variant="body2" color="text.secondary">
-                    No numbered questions were found in this company's PDF
-                    pages.
-                  </Typography>
-                ) : (
-                  <Paper
-                    variant="outlined"
-                    sx={{
-                      p: { xs: 2, sm: 2.5 },
-                      borderRadius: 1,
-                      borderColor: "rgba(35, 66, 50, 0.16)",
-                      boxShadow: "none",
-                    }}
-                  >
-                    <Stack
-                      direction={{ xs: "column", sm: "row" }}
-                      spacing={2}
-                      sx={{
-                        alignItems: { xs: "stretch", sm: "center" },
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Box sx={{ flex: 1 }}>
-                        <Typography
-                          variant="overline"
-                          sx={{ color: "#26745a", fontWeight: 800 }}
-                        >
-                          Question {currentQuestionIndex + 1} of{" "}
-                          {interviewQuestions.length}
-                        </Typography>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            mt: 0.5,
-                            color: "#1c2b24",
-                            fontWeight: 700,
-                            lineHeight: 1.55,
-                          }}
-                        >
-                          {currentQuestion.text}
-                        </Typography>
-                      </Box>
-                      <Button
-                        size="small"
-                        variant={
-                          answers[currentQuestion.id] ? "text" : "outlined"
-                        }
-                        startIcon={
-                          loadingAnswerId === currentQuestion.id ? (
-                            <CircularProgress size={14} />
-                          ) : (
-                            <AutoAwesomeIcon fontSize="small" />
-                          )
-                        }
-                        disabled={loadingAnswerId !== null}
-                        aria-expanded={
-                          expandedQuestionId === currentQuestion.id
-                        }
-                        onClick={() => void toggleSimpleAnswer(currentQuestion)}
-                        sx={{
-                          flexShrink: 0,
-                          alignSelf: { xs: "flex-start", sm: "center" },
-                          whiteSpace: "nowrap",
-                          textTransform: "none",
-                        }}
-                      >
-                        {answers[currentQuestion.id]
-                          ? expandedQuestionId === currentQuestion.id
-                            ? "Hide answer"
-                            : "Show answer"
-                          : loadingAnswerId === currentQuestion.id
-                            ? "Writing answer..."
-                            : "Show simple answer"}
-                      </Button>
-                    </Stack>
-
-                    <Collapse in={expandedQuestionId === currentQuestion.id}>
-                      {(answers[currentQuestion.id] ||
-                        answerErrors[currentQuestion.id] ||
-                        loadingAnswerId === currentQuestion.id) && (
-                        <Box
-                          sx={{
-                            mt: 2,
-                            p: { xs: 1.5, sm: 2 },
-                            borderRadius: 1,
-                            backgroundColor: "#f1f6f0",
-                          }}
-                        >
-                          {loadingAnswerId === currentQuestion.id && (
-                            <Stack
-                              direction="row"
-                              spacing={1}
-                              sx={{ alignItems: "center" }}
-                            >
-                              <CircularProgress size={16} />
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                              >
-                                Writing a simple explanation...
-                              </Typography>
-                            </Stack>
-                          )}
-                          {answers[currentQuestion.id] && (
-                            <Stack spacing={2}>
-                              <Box
-                                sx={{
-                                  p: { xs: 1.5, sm: 2 },
-                                  borderLeft: "3px solid #26745a",
-                                  borderRadius: "0 6px 6px 0",
-                                  backgroundColor: "#ffffff",
-                                }}
-                              >
-                                <Typography
-                                  variant="overline"
-                                  sx={{
-                                    color: "#26745a",
-                                    fontWeight: 800,
-                                  }}
-                                >
-                                  Interview-ready answer
-                                </Typography>
-                                <Typography
-                                  variant="body1"
-                                  sx={{
-                                    mt: 0.5,
-                                    color: "#1c2b24",
-                                    fontWeight: 650,
-                                    lineHeight: 1.7,
-                                  }}
-                                >
-                                  {answers[currentQuestion.id].interviewAnswer}
-                                </Typography>
-                              </Box>
-
-                              <Box>
-                                <Typography
-                                  variant="subtitle2"
-                                  sx={{ color: "#26745a", fontWeight: 800 }}
-                                >
-                                  In simple words
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    mt: 0.35,
-                                    color: "#34483d",
-                                    lineHeight: 1.7,
-                                  }}
-                                >
-                                  {
-                                    answers[currentQuestion.id]
-                                      .simpleExplanation
-                                  }
-                                </Typography>
-                              </Box>
-
-                              {answers[currentQuestion.id].example && (
-                                <Box
-                                  sx={{
-                                    p: { xs: 1.5, sm: 2 },
-                                    borderRadius: 1,
-                                    backgroundColor: "#fff8e9",
-                                  }}
-                                >
-                                  <Typography
-                                    variant="subtitle2"
-                                    sx={{ color: "#9a671d", fontWeight: 800 }}
-                                  >
-                                    Example
-                                  </Typography>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{
-                                      mt: 0.35,
-                                      color: "#493c2a",
-                                      lineHeight: 1.7,
-                                    }}
-                                  >
-                                    {answers[currentQuestion.id].example}
-                                  </Typography>
-                                </Box>
-                              )}
-
-                              <Box
-                                sx={{
-                                  pt: 1.25,
-                                  borderTop: "1px solid rgba(35, 66, 50, 0.12)",
-                                }}
-                              >
-                                <Typography
-                                  variant="subtitle2"
-                                  sx={{ color: "#26745a", fontWeight: 800 }}
-                                >
-                                  Key takeaway
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    mt: 0.35,
-                                    color: "#34483d",
-                                    lineHeight: 1.7,
-                                  }}
-                                >
-                                  {answers[currentQuestion.id].keyTakeaway}
-                                </Typography>
-                              </Box>
-                            </Stack>
-                          )}
-                          {answerErrors[currentQuestion.id] && (
-                            <Alert severity="warning" sx={{ py: 0 }}>
-                              {answerErrors[currentQuestion.id]}
-                            </Alert>
-                          )}
-                        </Box>
-                      )}
-                    </Collapse>
-
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      sx={{
-                        mt: 2,
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Button
-                        size="small"
-                        startIcon={<KeyboardArrowLeftIcon />}
-                        disabled={
-                          currentQuestionIndex === 0 || loadingAnswerId !== null
-                        }
-                        onClick={() => moveToQuestion(currentQuestionIndex - 1)}
-                        sx={{ textTransform: "none" }}
-                      >
-                        Previous
-                      </Button>
-                      <Typography variant="caption" color="text.secondary">
-                        {currentQuestion.number} · {currentQuestionIndex + 1}/
-                        {interviewQuestions.length}
-                      </Typography>
-                      <Button
-                        size="small"
-                        endIcon={<KeyboardArrowRightIcon />}
-                        disabled={
-                          currentQuestionIndex >=
-                            interviewQuestions.length - 1 ||
-                          loadingAnswerId !== null
-                        }
-                        onClick={() => moveToQuestion(currentQuestionIndex + 1)}
-                        sx={{ textTransform: "none" }}
-                      >
-                        Next question
-                      </Button>
-                    </Stack>
-                  </Paper>
-                )}
               </Box>
             )}
-          </Box>
+          </>
         )}
 
         <Button

@@ -47,16 +47,21 @@ const topics = [
     route: "/JavaImpQuestionsPage/SpringBoot",
   },
   {
-    title: "Hibernate / JPA",
-    subtitle: "ORM & Persistence",
+    title: "MultiThreading",
+    subtitle: "Concurrency & Parallelism",
     description:
-      "Entity lifecycle, caching levels, lazy vs eager loading, N+1 problem, transactions, JPQL, stored procedures, and annotations.",
-    tags: ["Entity Lifecycle", "Caching", "N+1 Problem", "JPQL"],
-    icon: <StorageIcon sx={{ fontSize: 20, color: "#eab308" }} />,
-    iconBg: "rgba(234, 179, 8, 0.08)",
-    tagBg: "rgba(234, 179, 8, 0.06)",
-    tagColor: "#fde047",
-    route: "/JavaImpQuestionsPage/Hibernate",
+      "Thread lifecycle, thread creation, Runnable vs Callable, synchronization, locks, deadlocks, race conditions, ExecutorService, Thread Pools, CompletableFuture, and Java Concurrency utilities.",
+    tags: [
+      "Thread Lifecycle",
+      "Synchronization",
+      "ExecutorService",
+      "CompletableFuture",
+    ],
+    icon: <AccountTreeIcon sx={{ fontSize: 20, color: "#0ea5e9" }} />,
+    iconBg: "rgba(14, 165, 233, 0.08)",
+    tagBg: "rgba(14, 165, 233, 0.06)",
+    tagColor: "#38bdf8",
+    route: "/JavaImpQuestionsPage/Multithreading",
   },
   {
     title: "Microservices",
@@ -70,6 +75,20 @@ const topics = [
     tagColor: "#c084fc",
     route: "/JavaImpQuestionsPage/Microservices",
   },
+
+  {
+    title: "Hibernate / JPA",
+    subtitle: "ORM & Persistence",
+    description:
+      "Entity lifecycle, caching levels, lazy vs eager loading, N+1 problem, transactions, JPQL, stored procedures, and annotations.",
+    tags: ["Entity Lifecycle", "Caching", "N+1 Problem", "JPQL"],
+    icon: <StorageIcon sx={{ fontSize: 20, color: "#eab308" }} />,
+    iconBg: "rgba(234, 179, 8, 0.08)",
+    tagBg: "rgba(234, 179, 8, 0.06)",
+    tagColor: "#fde047",
+    route: "/JavaImpQuestionsPage/Hibernate",
+  },
+
   {
     title: "Security",
     subtitle: "Identity & Protection",
@@ -92,6 +111,18 @@ const topics = [
     tagBg: "rgba(9, 2, 25, 0.06)",
     tagColor: "#050725",
     route: "/JavaImpQuestionsPage/Debugging",
+  },
+  {
+    title: "System Design",
+    subtitle: "Designing scalable, reliable, and efficient software systems",
+    description:
+      "Explore system architecture, design patterns, scalability, and real-world application design",
+    tags: ["System Design"],
+    icon: <StorageIcon sx={{ fontSize: 20, color: "#eab308" }} />,
+    iconBg: "rgba(8, 3, 16, 0.08)",
+    tagBg: "rgba(9, 2, 25, 0.06)",
+    tagColor: "#050725",
+    route: "/JavaImpQuestionsPage/SystemDesign",
   },
 ];
 
@@ -126,10 +157,10 @@ const JavaImpQuestions = () => {
           </Typography>
         </Box>
 
-        <Button
+        {/* <Button
           variant="outlined"
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate("/Dashboard")}
+          onClick={() => navigate("/learning")}
           sx={{
             borderRadius: "10px",
             textTransform: "none",
@@ -146,10 +177,10 @@ const JavaImpQuestions = () => {
           }}
         >
           Back to Dashboard
-        </Button>
+        </Button> */}
         <Button
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/learning")}
           sx={{ mb: 2, fontWeight: 600 }}
         >
           Back

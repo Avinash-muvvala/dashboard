@@ -64,45 +64,45 @@ const posts: Post[] = [
     kind: "Topics",
     route: "/ReactPosts",
   },
-  // {
-  //   title: "Java Questions",
-  //   description:
-  //     "Core Java, Spring Boot, Hibernate and microservices questions.",
-  //   category: "Java",
-  //   kind: "Questions",
-  //   route: "/JavaImpQuestions",
-  // },
-  // {
-  //   title: "React Questions",
-  //   description: "The most frequently asked React interview questions.",
-  //   category: "React",
-  //   kind: "Questions",
-  //   route: "/ReactImpQuestions",
-  // },
-  // {
-  //   title: "Java Guide",
-  //   description:
-  //     "Java basics, core Java, Spring Boot, Hibernate and microservices.",
-  //   category: "Java",
-  //   kind: "Guide",
-  //   route: "/JavaBackendGuide",
-  // },
+  {
+    title: "Java Questions",
+    description:
+      "Core Java, Spring Boot, Hibernate and microservices questions.",
+    category: "Java",
+    kind: "Questions",
+    route: "/JavaImpQuestions",
+  },
+  {
+    title: "React Questions",
+    description: "The most frequently asked React interview questions.",
+    category: "React",
+    kind: "Questions",
+    route: "/ReactImpQuestions",
+  },
+  {
+    title: "Java Guide",
+    description:
+      "Java basics, core Java, Spring Boot, Hibernate and microservices.",
+    category: "Java",
+    kind: "Guide",
+    route: "/JavaBackendGuide",
+  },
 
-  // {
-  //   title: "React Guide",
-  //   description:
-  //     "JavaScript, React, advanced patterns and a deployment roadmap.",
-  //   category: "React",
-  //   kind: "Guide",
-  //   route: "/react-guide",
-  // },
-  // {
-  //   title: "Questions Asked by Companies",
-  //   description: "Browse interview question PDFs company by company.",
-  //   category: "Full Stack",
-  //   kind: "Questions",
-  //   route: "/CompanyQuestions",
-  // },
+  {
+    title: "React Guide",
+    description:
+      "JavaScript, React, advanced patterns and a deployment roadmap.",
+    category: "React",
+    kind: "Guide",
+    route: "/react-guide",
+  },
+  {
+    title: "Questions Asked by Companies",
+    description: "Browse interview question PDFs company by company.",
+    category: "Full Stack",
+    kind: "Questions",
+    route: "/CompanyQuestions",
+  },
   {
     title: "SQL Interview Practice",
     description:

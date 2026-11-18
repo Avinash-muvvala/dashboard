@@ -231,6 +231,246 @@ const additionalQuestions = {
         "BrowserRouter uses the browser's History API to update and respond to URLs while keeping navigation within the single-page application, without a full-page reload.",
     },
   ],
+  39: [
+    {
+      question: "How do route definitions help organize an SPA?",
+      answer:
+        "Routes map URL paths to specific components, so the app can render the correct view for each page without full reloads.",
+    },
+    {
+      question: "Why is a nested route useful in a dashboard app?",
+      answer:
+        "Nested routes let you reuse a parent layout while changing only the child content, such as users, settings, and profile pages under one shell.",
+    },
+  ],
+  40: [
+    {
+      question: "What is a dynamic route in React Router?",
+      answer:
+        "A dynamic route contains parameters like `/users/:id`, allowing one route to match multiple URLs and render different data depending on the value.",
+    },
+    {
+      question: "How do you read a route parameter?",
+      answer:
+        "Use the `useParams()` hook to pull values from the current URL, such as `const { id } = useParams()`.",
+    },
+  ],
+  41: [
+    {
+      question: "Why is `async/await` helpful with API requests in React?",
+      answer:
+        "It makes asynchronous logic easier to read and reason about while waiting for a response and then updating state.",
+    },
+    {
+      question: "What should happen when a fetch response is not OK?",
+      answer:
+        "Check `response.ok` and throw an error or set an error state so the UI can show a failure message instead of pretending the request succeeded.",
+    },
+  ],
+  42: [
+    {
+      question: "When should you choose `fetch` over Axios?",
+      answer:
+        "Use `fetch` when you want a native browser API with no extra dependency. Choose Axios when you want cleaner request defaults, interceptors, and easier centralized configuration.",
+    },
+    {
+      question: "What are Axios interceptors useful for?",
+      answer:
+        "They let you attach auth headers globally or handle token refresh and 401 responses in one place before requests or responses reach your components.",
+    },
+  ],
+  43: [
+    {
+      question:
+        "Why do React apps usually show a loading indicator during async work?",
+      answer:
+        "It tells the user that work is in progress and prevents confusion while waiting for data, form submission, or a redirect.",
+    },
+    {
+      question: "Why is a `finally` block useful in async logic?",
+      answer:
+        "It guarantees cleanup work like setting `loading` back to false runs whether the request succeeds or fails.",
+    },
+  ],
+  44: [
+    {
+      question: "How should a React app handle API failures?",
+      answer:
+        "Capture the error, store it in component state, render a helpful message, and offer a retry action when the situation makes sense.",
+    },
+    {
+      question: "What is the difference between a 401 and a 403 error?",
+      answer:
+        "401 means the user is not authenticated or the token is invalid; 403 means the user is authenticated but does not have permission to access the resource.",
+    },
+  ],
+  45: [
+    {
+      question: "What is a controlled form in React?",
+      answer:
+        "A controlled form stores each input value in state and updates it with `onChange`, so the UI and state stay synchronized.",
+    },
+    {
+      question: "Why call `event.preventDefault()` on form submit?",
+      answer:
+        "It prevents the browser's default full-page reload and lets the app validate, send data, and update the interface in a controlled way.",
+    },
+  ],
+  46: [
+    {
+      question: "What is the typical login flow in a React app?",
+      answer:
+        "A user submits credentials, the app validates them, sends a request to the backend, receives a token or session, and then navigates to a protected page.",
+    },
+    {
+      question: "How do you redirect after a successful login?",
+      answer:
+        "Use `useNavigate()` from React Router and call `navigate('/dashboard')` or another route after the request succeeds.",
+    },
+  ],
+  47: [
+    {
+      question: "What is a protected route?",
+      answer:
+        "A route guard that checks if a user is authenticated before rendering a page; unauthenticated users are redirected to the login page.",
+    },
+    {
+      question:
+        "Why does frontend protection not replace server-side authorization?",
+      answer:
+        "The UI can hide pages, but the backend must still validate tokens and permissions for every API request because users can bypass the frontend.",
+    },
+  ],
+  48: [
+    {
+      question: "What is an access token used for?",
+      answer:
+        "An access token is a short-lived credential that proves a user is authenticated and allows the app to request protected backend resources.",
+    },
+    {
+      question: "How do you send a JWT in an API request?",
+      answer:
+        "Add it to the `Authorization` header as `Bearer <token>`, usually via a shared request helper or an Axios interceptor.",
+    },
+  ],
+  49: [
+    {
+      question: "Why do apps use refresh tokens?",
+      answer:
+        "A refresh token lets the app obtain a new access token without asking the user to log in again when the access token expires.",
+    },
+    {
+      question: "What is refresh-token rotation?",
+      answer:
+        "It means the server issues a new refresh token when one is used and invalidates the old one, reducing the chance of token theft or replay.",
+    },
+  ],
+  50: [
+    {
+      question: "What is REST API integration in React?",
+      answer:
+        "It is the process of sending HTTP requests to backend endpoints to fetch, create, update, or delete data and then rendering the results in the UI.",
+    },
+    {
+      question:
+        "Why is CORS important when React and Spring Boot run on different ports?",
+      answer:
+        "The browser blocks cross-origin requests unless the backend explicitly allows the frontend origin, so the server must allow the correct origin for development and production.",
+    },
+  ],
+  51: [
+    {
+      question: "Why do developers use libraries like React Hook Form?",
+      answer:
+        "They simplify form state management, validation, and submission while reducing boilerplate code and unnecessary re-renders.",
+    },
+    {
+      question: "What is schema validation?",
+      answer:
+        "Schema validation defines rules for a form or payload, such as required fields or email format, and checks the entire object before submission.",
+    },
+  ],
+  52: [
+    {
+      question: "Why is form validation important before a submit call?",
+      answer:
+        "Validation prevents invalid data from reaching the backend, reduces API errors, and improves the user experience by surfacing issues early.",
+    },
+    {
+      question:
+        "What is the difference between client-side and server-side validation?",
+      answer:
+        "Client-side validation improves feedback and UX, while server-side validation protects the backend and enforces trusted rules that users cannot bypass.",
+    },
+  ],
+  53: [
+    {
+      question: "What is an Error Boundary in React?",
+      answer:
+        "An Error Boundary is a component that catches rendering errors in its child tree and shows a fallback UI instead of crashing the entire application.",
+    },
+    {
+      question: "Which methods are commonly used in Error Boundaries?",
+      answer:
+        "`getDerivedStateFromError()` updates state to render a fallback UI, and `componentDidCatch()` logs the error for debugging.",
+    },
+  ],
+  54: [
+    {
+      question: "Why is lazy loading useful in a large React app?",
+      answer:
+        "It defers loading some components until they are needed, which reduces the initial bundle size and improves perceived performance.",
+    },
+    {
+      question:
+        "What is the relationship between lazy loading and code splitting?",
+      answer:
+        "Code splitting divides the bundle into smaller chunks; lazy loading loads those chunks only when a route or component is actually requested.",
+    },
+  ],
+  55: [
+    {
+      question: "What does React code splitting accomplish?",
+      answer:
+        "It breaks large bundles into smaller chunks so the browser loads only what is needed when a user navigates to a part of the app.",
+    },
+    {
+      question: "How does `Suspense` help with lazy-loaded components?",
+      answer:
+        "`Suspense` displays a fallback UI while the lazy-loaded module is being fetched and resolved.",
+    },
+  ],
+  56: [
+    {
+      question: "How can `React.memo` improve performance?",
+      answer:
+        "It memoizes a component so React skips re-rendering when its props are unchanged, avoiding unnecessary work in stable UI trees.",
+    },
+    {
+      question: "When should you be careful with memoization?",
+      answer:
+        "Memoization adds complexity and can hurt performance if overused on cheap components or values that change frequently; use it where the cost of render or recalculation is genuinely high.",
+    },
+  ],
+  57: [
+    {
+      question: "What can you inspect in the React DevTools Components tab?",
+      answer:
+        "It shows the React component tree and lets you inspect component props, state, hooks, context, and relationships to parent and child components.",
+    },
+    {
+      question:
+        "How does the React DevTools Profiler help diagnose performance issues?",
+      answer:
+        "It records component renders and their durations, helping identify components that render often or take a long time to update.",
+    },
+    {
+      question:
+        "How is React DevTools different from the browser's Elements panel?",
+      answer:
+        "React DevTools inspects the React component tree and its props and state, while the Elements panel inspects the rendered DOM and CSS.",
+    },
+  ],
 } satisfies Record<number, { question: string; answer: string }[]>;
 
 export const ReactPracticeQuestions: Record<

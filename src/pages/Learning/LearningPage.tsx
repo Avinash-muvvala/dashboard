@@ -20,7 +20,7 @@ const LearningPage = () => {
       >
         <Button
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/")}
           sx={{ mb: 2, fontWeight: 600 }}
         >
           Back to dashboard

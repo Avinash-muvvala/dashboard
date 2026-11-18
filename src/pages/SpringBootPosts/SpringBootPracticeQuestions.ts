@@ -653,4 +653,232 @@ export const SpringBootPracticeQuestions: Record<
         "CSRF is generally kept enabled for cookie-based browser sessions. It may be disabled for a stateless API using a non-cookie token design, after considering the threat model. CORS controls cross-origin browser access and does not replace CSRF protection or authentication.",
     },
   ],
+  150: [
+    {
+      question: "What is form-based authentication in Spring Security?",
+      answer:
+        "It is a login flow where the user submits credentials through a form and Spring Security authenticates them and manages the session or redirects.",
+    },
+    {
+      question: "Why do we configure defaultSuccessUrl() in form login?",
+      answer:
+        "It sends the user to a chosen page after successful authentication, making the login flow consistent and user-friendly.",
+    },
+  ],
+  151: [
+    {
+      question: "What is HTTP Basic Authentication?",
+      answer:
+        "It is a simple protocol-based authentication method where the browser sends a username and password in the Authorization header, typically using Base64 encoding.",
+    },
+    {
+      question: "Why must HTTPS be used with Basic Authentication?",
+      answer:
+        "Base64 is reversible and not encrypted, so credentials must be protected in transit with HTTPS to prevent interception.",
+    },
+  ],
+  152: [
+    {
+      question: "What is JWT in Spring Boot?",
+      answer:
+        "JWT is a compact, signed token format used to carry claims about a user and allow stateless authentication for API requests.",
+    },
+    {
+      question: "What is the purpose of a Bearer token?",
+      answer:
+        "A Bearer token is sent in the Authorization header so the server can validate who the caller is and authorize access to protected endpoints.",
+    },
+  ],
+  153: [
+    {
+      question: "What are the three parts of a JWT?",
+      answer:
+        "Header, payload, and signature. The header tells the algorithm, the payload contains claims, and the signature verifies integrity.",
+    },
+    {
+      question: "Why should sensitive values not be stored in a JWT payload?",
+      answer:
+        "JWT payloads are encoded, not encrypted, so anyone with the token can decode them. Sensitive data should be kept out of the token.",
+    },
+  ],
+  154: [
+    {
+      question: "What is the standard JWT authentication flow?",
+      answer:
+        "The client logs in, the backend validates the credentials, returns a signed JWT, and the client sends that token in the Authorization header for each protected request.",
+    },
+    {
+      question: "What happens when a JWT is expired or invalid?",
+      answer:
+        "The request is rejected with a 401 Unauthorized response and the client must re-authenticate or refresh the token.",
+    },
+  ],
+  155: [
+    {
+      question: "How is a JWT generated in Spring Boot?",
+      answer:
+        "A service builds a token with Jwts.builder(), sets claims such as subject and expiration, signs it with a secret key, and compacts it into a JWT string.",
+    },
+    {
+      question: "Why do we set an expiration time on JWTs?",
+      answer:
+        "Expiration limits how long a stolen or leaked token remains usable and reduces the risk of long-lived impersonation.",
+    },
+  ],
+  156: [
+    {
+      question: "What is JWT validation?",
+      answer:
+        "It is the process of verifying a token's signature, expiry, structure, and claims before allowing access to protected APIs.",
+    },
+    {
+      question: "Why do we use OncePerRequestFilter for JWT validation?",
+      answer:
+        "It ensures the authentication filter runs once per request, preventing duplicate validation and duplicate security context setup.",
+    },
+  ],
+  157: [
+    {
+      question: "What is stateless authentication?",
+      answer:
+        "It means the server does not store an HTTP session for the user; instead, each request carries a token that the server validates independently.",
+    },
+    {
+      question: "What does SessionCreationPolicy.STATELESS do?",
+      answer:
+        "It tells Spring Security not to create or store server-side sessions for authentication state, which is common in JWT-based REST APIs.",
+    },
+  ],
+  158: [
+    {
+      question: "What is role-based access control?",
+      answer:
+        "RBAC grants permissions based on roles such as USER, ADMIN, or MANAGER, so access rules can be configured at a broad but controlled level.",
+    },
+    {
+      question: "What is the difference between hasRole and hasAuthority?",
+      answer:
+        "hasRole adds the ROLE_ prefix automatically, while hasAuthority checks the exact authority string as given.",
+    },
+  ],
+  159: [
+    {
+      question: "What is method-level security?",
+      answer:
+        "It restricts access to specific methods based on role or authority rules, providing fine-grained authorization beyond route-level checks.",
+    },
+    {
+      question: "What does @EnableMethodSecurity do?",
+      answer:
+        "It enables annotation-based method security such as @PreAuthorize and @PostAuthorize for service or controller methods.",
+    },
+  ],
+  160: [
+    {
+      question: "What is CSRF in Spring Security?",
+      answer:
+        "CSRF is a cross-site request forgery attack where a malicious site tricks a user’s browser into sending a state-changing request to a trusted application.",
+    },
+    {
+      question: "When should CSRF protection be disabled?",
+      answer:
+        "Only for fully stateless APIs that do not use browser cookies and rely on explicit headers such as Authorization bearer tokens for authentication.",
+    },
+  ],
+  161: [
+    {
+      question: "What is CORS in a Spring Boot application?",
+      answer:
+        "CORS is a browser mechanism that allows or blocks cross-origin API requests from one origin to another, such as a React frontend calling a Spring Boot backend.",
+    },
+    {
+      question: "Why is CORS configuration needed for React and Spring Boot?",
+      answer:
+        "They often run on different ports or domains, so the browser blocks cross-origin requests unless the backend explicitly allows the frontend origin.",
+    },
+  ],
+  162: [
+    {
+      question: "What is OAuth 2.0?",
+      answer:
+        "OAuth 2.0 is an authorization framework that lets an app access protected resources on behalf of a user without directly handling the user's password.",
+    },
+    {
+      question: "What is the difference between OAuth 2.0 and OIDC?",
+      answer:
+        "OAuth 2.0 focuses on authorization and delegated access, while OpenID Connect adds identity and user authentication information on top of that model.",
+    },
+  ],
+  163: [
+    {
+      question: "What is social login in Spring Boot?",
+      answer:
+        "Social login lets users sign in with an existing external provider such as Google or GitHub instead of creating a separate account for your app.",
+    },
+    {
+      question: "What is the default Google callback URL in Spring Security?",
+      answer:
+        "It is /login/oauth2/code/google, which is the endpoint used by the provider to send the authorization result back to the app.",
+    },
+  ],
+  164: [
+    {
+      question: "What is session management in Spring Boot?",
+      answer:
+        "It is the process of tracking a user's authenticated state across multiple HTTP requests so the app can remember login state and user context.",
+    },
+    {
+      question: "What is the role of a session ID?",
+      answer:
+        "The session ID identifies the user's server-side session and is usually stored in a cookie that the browser sends with subsequent requests.",
+    },
+  ],
+  165: [
+    {
+      question: "Why should passwords never be stored in plain text?",
+      answer:
+        "A database breach could expose every user password, allowing attackers to reuse the same credentials on other systems. Hashing prevents direct recovery of plaintext passwords.",
+    },
+    {
+      question: "Why is HTTPS required in production?",
+      answer:
+        "HTTPS encrypts traffic in transit, protecting tokens, passwords, and other sensitive information from interception or tampering.",
+    },
+  ],
+  166: [
+    {
+      question: "What is a refresh token?",
+      answer:
+        "A refresh token is a longer-lived credential used to get a new access token without making the user log in again when the current access token expires.",
+    },
+    {
+      question: "What is refresh token rotation?",
+      answer:
+        "It means issuing a new refresh token after each refresh and invalidating the old one so stolen tokens are less useful and reuse can be detected.",
+    },
+  ],
+  167: [
+    {
+      question: "What is the difference between an access token and a refresh token?",
+      answer:
+        "An access token is short-lived and used for protected API calls, while a refresh token is longer-lived and used only to request a new access token.",
+    },
+    {
+      question: "Why should refresh tokens be stored securely?",
+      answer:
+        "If a refresh token is stolen, an attacker may keep renewing access tokens and impersonate the user, so they need secure storage and revocation support.",
+    },
+  ],
+  168: [
+    {
+      question: "Why is Spring Security important for securing REST APIs?",
+      answer:
+        "Spring Security provides authentication and authorization, protects against common web vulnerabilities, and helps enforce rules such as login requirements, role restrictions, and secure request handling.",
+    },
+    {
+      question: "How do JWT and BCrypt improve API security?",
+      answer:
+        "JWT enables stateless authentication by issuing signed tokens for protected API requests, while BCrypt securely hashes passwords before storing them so passwords are not exposed if the database is compromised.",
+    },
+  ],
 };
