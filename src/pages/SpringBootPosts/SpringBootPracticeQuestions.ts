@@ -859,7 +859,8 @@ export const SpringBootPracticeQuestions: Record<
   ],
   167: [
     {
-      question: "What is the difference between an access token and a refresh token?",
+      question:
+        "What is the difference between an access token and a refresh token?",
       answer:
         "An access token is short-lived and used for protected API calls, while a refresh token is longer-lived and used only to request a new access token.",
     },

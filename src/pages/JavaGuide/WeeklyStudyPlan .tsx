@@ -11,9 +11,6 @@ import {
   TextField,
   Tabs,
   Tab,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -24,12 +21,10 @@ import {
   Stack,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import CodeIcon from "@mui/icons-material/Code";
-import QuizIcon from "@mui/icons-material/Quiz";
 import LinkIcon from "@mui/icons-material/Link";
 import NoteAltIcon from "@mui/icons-material/NoteAlt";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
@@ -723,11 +718,348 @@ const weeklyPlan = [
       },
     ],
   },
+  {
+    week: 15,
+    phase: "8A",
+    title: "Entity Relationships",
+    color: "#7C3AED",
+    days: "Mon – Fri",
+    topics: [
+      "One-to-many relationships",
+      "Many-to-one relationships",
+      "Many-to-many relationships",
+      "Cascade types",
+      "Fetch strategies",
+    ],
+    theoretical: [
+      "How do owning and inverse sides work in a JPA relationship?",
+      "When should cascade operations be used?",
+      "What is the difference between lazy and eager fetching?",
+    ],
+    coding: [
+      "Model customers and orders with a bidirectional one-to-many relationship.",
+      "Add cascade behavior and test which operations propagate.",
+      "Model students and courses with a many-to-many relationship.",
+    ],
+    resources: [
+      {
+        label: "Hibernate ORM User Guide",
+        url: "https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html",
+      },
+      {
+        label: "Spring Data JPA Reference",
+        url: "https://docs.spring.io/spring-data/jpa/reference/",
+      },
+    ],
+  },
+  {
+    week: 16,
+    phase: "8B",
+    title: "Queries and Migrations",
+    color: "#6D28D9",
+    days: "Mon – Fri",
+    topics: [
+      "Derived query methods",
+      "JPQL queries",
+      "Native SQL queries",
+      "Flyway migrations",
+      "Liquibase migrations",
+      "N+1 query detection",
+    ],
+    theoretical: [
+      "When should you use JPQL instead of a derived query method?",
+      "How do Flyway and Liquibase manage schema changes?",
+      "How can fetch joins or entity graphs address N+1 queries?",
+    ],
+    coding: [
+      "Create repository methods for searching and paging through records.",
+      "Write a JPQL query with filtering and a join.",
+      "Add versioned Flyway migrations and verify them against a fresh database.",
+    ],
+    resources: [
+      {
+        label: "Spring Data JPA Query Methods",
+        url: "https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html",
+      },
+      {
+        label: "Flyway Documentation",
+        url: "https://documentation.red-gate.com/flyway",
+      },
+      { label: "Liquibase Documentation", url: "https://docs.liquibase.com/" },
+    ],
+  },
+  {
+    week: 17,
+    phase: "9A",
+    title: "Spring Security Foundations",
+    color: "#DC2626",
+    days: "Mon – Fri",
+    topics: [
+      "Spring Security filter chain",
+      "Security configuration",
+      "Password encoding",
+      "Authentication",
+      "Authorization",
+    ],
+    theoretical: [
+      "How does a request pass through the Spring Security filter chain?",
+      "What is the difference between authentication and authorization?",
+      "Why should passwords be stored using a one-way password encoder?",
+    ],
+    coding: [
+      "Configure public and protected endpoints in a Spring Boot API.",
+      "Add password hashing with a DelegatingPasswordEncoder.",
+      "Write tests for authenticated and unauthenticated requests.",
+    ],
+    resources: [
+      {
+        label: "Spring Security Reference",
+        url: "https://docs.spring.io/spring-security/reference/",
+      },
+      {
+        label: "Password Storage",
+        url: "https://docs.spring.io/spring-security/reference/features/authentication/password-storage.html",
+      },
+    ],
+  },
+  {
+    week: 18,
+    phase: "9B",
+    title: "JWT and OAuth2",
+    color: "#B91C1C",
+    days: "Mon – Fri",
+    topics: [
+      "JWT authentication flow",
+      "Access and refresh tokens",
+      "Role-based access control",
+      "@PreAuthorize",
+      "OAuth2 concepts",
+    ],
+    theoretical: [
+      "What claims belong in a JWT, and what should never be stored in one?",
+      "How do access tokens and refresh tokens differ?",
+      "When is OAuth2 a better fit than issuing application-specific JWTs?",
+    ],
+    coding: [
+      "Protect API operations with role-based method security.",
+      "Add token validation to a test application using a supported Spring Security flow.",
+      "Document the login and authorization flow for the API.",
+    ],
+    resources: [
+      {
+        label: "Spring Security OAuth2 Resource Server",
+        url: "https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/index.html",
+      },
+      { label: "OAuth 2.0 Simplified", url: "https://www.oauth.com/" },
+    ],
+  },
+  {
+    week: 19,
+    phase: "10A",
+    title: "Unit Testing",
+    color: "#0891B2",
+    days: "Mon – Fri",
+    topics: [
+      "JUnit 5 tests",
+      "Mockito mocks",
+      "Test fixtures",
+      "Assertions",
+      "Mocking dependencies",
+    ],
+    theoretical: [
+      "What makes a unit test isolated and deterministic?",
+      "When should a test use a mock instead of a real dependency?",
+      "How do assertions communicate expected behavior?",
+    ],
+    coding: [
+      "Test service success and failure cases with JUnit 5.",
+      "Use Mockito to verify repository interactions.",
+      "Refactor repeated test setup into readable fixtures.",
+    ],
+    resources: [
+      {
+        label: "JUnit 5 User Guide",
+        url: "https://junit.org/junit5/docs/current/user-guide/",
+      },
+      { label: "Mockito Documentation", url: "https://site.mockito.org/" },
+    ],
+  },
+  {
+    week: 20,
+    phase: "10B",
+    title: "Integration Testing",
+    color: "#0E7490",
+    days: "Mon – Fri",
+    topics: [
+      "Spring Boot integration tests",
+      "Testcontainers",
+      "Database integration tests",
+      "API integration tests",
+      "Spring test slices",
+    ],
+    theoretical: [
+      "What behavior should an integration test verify?",
+      "Why can Testcontainers be more representative than an in-memory database?",
+      "When should you use @WebMvcTest versus @SpringBootTest?",
+    ],
+    coding: [
+      "Test a REST endpoint with MockMvc and verify validation errors.",
+      "Run a repository test against a Testcontainers database.",
+      "Add an end-to-end integration test for a core API workflow.",
+    ],
+    resources: [
+      {
+        label: "Spring Boot Testing",
+        url: "https://docs.spring.io/spring-boot/reference/testing/",
+      },
+      {
+        label: "Testcontainers for Java",
+        url: "https://java.testcontainers.org/",
+      },
+    ],
+  },
+  {
+    week: 21,
+    phase: "11A",
+    title: "Containerization",
+    color: "#2563EB",
+    days: "Mon – Fri",
+    topics: [
+      "Dockerfiles",
+      "Multi-stage builds",
+      "Docker Compose",
+      "Container networking",
+      "Application configuration",
+    ],
+    theoretical: [
+      "What are the benefits of a multi-stage Docker build?",
+      "How do containers communicate on a Docker network?",
+      "How should configuration differ between local and deployed environments?",
+    ],
+    coding: [
+      "Create a multi-stage Dockerfile for a Spring Boot application.",
+      "Run the API and its database together with Docker Compose.",
+      "Pass environment-specific settings without baking secrets into an image.",
+    ],
+    resources: [
+      {
+        label: "Docker Get Started",
+        url: "https://docs.docker.com/get-started/",
+      },
+      {
+        label: "Docker Compose Documentation",
+        url: "https://docs.docker.com/compose/",
+      },
+    ],
+  },
+  {
+    week: 22,
+    phase: "11B",
+    title: "CI/CD and Deployment",
+    color: "#1D4ED8",
+    days: "Mon – Fri",
+    topics: [
+      "GitHub Actions",
+      "Build and test pipelines",
+      "Docker image publishing",
+      "Environment secrets",
+      "Deployment fundamentals",
+    ],
+    theoretical: [
+      "What stages belong in a basic CI pipeline?",
+      "How should CI workflows handle credentials and secrets?",
+      "Why should deployment artifacts be built and tested consistently?",
+    ],
+    coding: [
+      "Create a GitHub Actions workflow that builds and tests the project.",
+      "Build a Docker image after a successful test run.",
+      "Document deployment configuration and required environment variables.",
+    ],
+    resources: [
+      {
+        label: "GitHub Actions Documentation",
+        url: "https://docs.github.com/en/actions",
+      },
+      {
+        label: "Docker Image Publishing",
+        url: "https://docs.docker.com/build/ci/github-actions/",
+      },
+    ],
+  },
+  {
+    week: 23,
+    phase: "12A",
+    title: "Production Readiness",
+    color: "#059669",
+    days: "Mon – Fri",
+    topics: [
+      "Spring Boot Actuator",
+      "Structured logging",
+      "Application metrics",
+      "Health checks",
+      "Caching",
+      "Graceful error handling",
+    ],
+    theoretical: [
+      "Which Actuator endpoints are useful for operational health checks?",
+      "What information should be included in logs without exposing sensitive data?",
+      "What trade-offs should be considered when adding a cache?",
+    ],
+    coding: [
+      "Expose only appropriate health and metrics endpoints.",
+      "Add request correlation IDs to application logs.",
+      "Cache a read-heavy operation and test cache invalidation behavior.",
+    ],
+    resources: [
+      {
+        label: "Spring Boot Actuator",
+        url: "https://docs.spring.io/spring-boot/reference/actuator/",
+      },
+      {
+        label: "Spring Cache Abstraction",
+        url: "https://docs.spring.io/spring-framework/reference/integration/cache.html",
+      },
+    ],
+  },
+  {
+    week: 24,
+    phase: "12B",
+    title: "Capstone and Portfolio",
+    color: "#047857",
+    days: "Mon – Fri",
+    topics: [
+      "Design a complete REST service",
+      "Add authentication and authorization",
+      "Write unit and integration tests",
+      "Containerize and deploy the application",
+      "Document architecture and API usage",
+    ],
+    theoretical: [
+      "How do you explain the architecture and key trade-offs in your project?",
+      "Which tests provide confidence in the most important user workflows?",
+      "What operational details should be included in a deployment handoff?",
+    ],
+    coding: [
+      "Build a documented REST API with persistence and validation.",
+      "Add authentication, authorization, and focused automated tests.",
+      "Package and deploy the project, then add setup instructions to its README.",
+    ],
+    resources: [
+      {
+        label: "Spring Boot Reference",
+        url: "https://docs.spring.io/spring-boot/reference/",
+      },
+      {
+        label: "OpenAPI Specification",
+        url: "https://spec.openapis.org/oas/latest.html",
+      },
+    ],
+  },
 ];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type TabKey = "topics" | "theory" | "coding" | "resources" | "notes";
+type TabKey = "topics" | "coding" | "resources" | "notes";
 type PracticeLang = "java" | "python" | "javascript";
 
 type PracticeTarget = {
@@ -776,8 +1108,6 @@ const WeeklyStudyPlan = () => {
   }: {
     guideKey: string;
     color: string;
-    onComplete: () => void;
-    completed: boolean;
   }) => {
     const guide = topicGuides[guideKey];
     const [open, setOpen] = useState(false);
@@ -785,22 +1115,28 @@ const WeeklyStudyPlan = () => {
     if (!guide) return null; // no guide yet for this topic
 
     return (
-      <Box sx={{ mt: 0.5, ml: 3.5 }}>
+      <Box sx={{ mt: 2 }}>
         <Button
           size="small"
+          startIcon={<MenuBookIcon sx={{ fontSize: 16 }} />}
           onClick={() => setOpen((p) => !p)}
           sx={{
-            fontSize: 11,
+            fontSize: 12,
             textTransform: "none",
             color: open ? color : "text.secondary",
-            px: 1,
-            py: 0.25,
+            px: 1.25,
+            py: 0.5,
             minWidth: 0,
-            fontWeight: 600,
-            "&:hover": { backgroundColor: `${color}10` },
+            fontWeight: 700,
+            borderRadius: 2,
+            border: `1px solid ${color}30`,
+            "&:hover": {
+              backgroundColor: `${color}10`,
+              borderColor: `${color}70`,
+            },
           }}
         >
-          {open ? "▲ Hide Guide" : "▼ Read Guide"}
+          {open ? "Hide guide" : "Read guide"}
         </Button>
 
         {open && (
@@ -923,14 +1259,6 @@ const WeeklyStudyPlan = () => {
         {},
       ),
   );
-  // checked theoretical per week: { "1-0": true }
-  const [checkedTheory, setCheckedTheory] = useState<Record<string, boolean>>(
-    () =>
-      loadStoredState<Record<string, boolean>>(
-        "weekly-study-checkedTheory",
-        {},
-      ),
-  );
   // checked coding per week
   const [checkedCoding, setCheckedCoding] = useState<Record<string, boolean>>(
     () =>
@@ -945,20 +1273,16 @@ const WeeklyStudyPlan = () => {
   );
   // active tab per week
   const [activeTabs, setActiveTabs] = useState<Record<number, TabKey>>(() =>
-    loadStoredState<Record<number, TabKey>>("weekly-study-activeTabs", {}),
+    loadStoredState<Record<number, TabKey>>("weekly-study-activeTabs-v2", {}),
   );
-  // expanded week
-  const [expandedWeek, setExpandedWeek] = useState<number | false>(() =>
-    loadStoredState<number | false>("weekly-study-expandedWeek", false),
+  const [selectedWeekNumber, setSelectedWeekNumber] = useState<number>(() =>
+    loadStoredState<number>("weekly-study-selectedWeek", 1),
   );
+  const [activeTopicIndex, setActiveTopicIndex] = useState(0);
 
   useEffect(() => {
     saveStoredState("weekly-study-checkedTopics", checkedTopics);
   }, [checkedTopics]);
-
-  useEffect(() => {
-    saveStoredState("weekly-study-checkedTheory", checkedTheory);
-  }, [checkedTheory]);
 
   useEffect(() => {
     saveStoredState("weekly-study-checkedCoding", checkedCoding);
@@ -969,12 +1293,12 @@ const WeeklyStudyPlan = () => {
   }, [notes]);
 
   useEffect(() => {
-    saveStoredState("weekly-study-activeTabs", activeTabs);
+    saveStoredState("weekly-study-activeTabs-v2", activeTabs);
   }, [activeTabs]);
 
   useEffect(() => {
-    saveStoredState("weekly-study-expandedWeek", expandedWeek);
-  }, [expandedWeek]);
+    saveStoredState("weekly-study-selectedWeek", selectedWeekNumber);
+  }, [selectedWeekNumber]);
 
   // ─── Practice / Compiler dialog state ──────────────────────────────────────
   const [practiceTarget, setPracticeTarget] = useState<PracticeTarget | null>(
@@ -1108,15 +1432,25 @@ const WeeklyStudyPlan = () => {
   const toggleTopic = (key: string) =>
     setCheckedTopics((p) => ({ ...p, [key]: !p[key] }));
 
-  const toggleTheory = (key: string) =>
-    setCheckedTheory((p) => ({ ...p, [key]: !p[key] }));
-
   const toggleCoding = (key: string) =>
     setCheckedCoding((p) => ({ ...p, [key]: !p[key] }));
 
   const getTab = (week: number): TabKey => activeTabs[week] ?? "topics";
   const setTab = (week: number, tab: TabKey) =>
     setActiveTabs((p) => ({ ...p, [week]: tab }));
+  const selectWeek = (week: number) => {
+    setSelectedWeekNumber(week);
+    setActiveTopicIndex(0);
+    setTab(week, "topics");
+
+    if (window.matchMedia("(max-width: 899px)").matches) {
+      window.requestAnimationFrame(() => {
+        document
+          .getElementById("selected-week-content")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  };
 
   // Overall progress across all topics
   const totalTopics = weeklyPlan.reduce((s, w) => s + w.topics.length, 0);
@@ -1132,16 +1466,21 @@ const WeeklyStudyPlan = () => {
     return Math.round((done / w.topics.length) * 100);
   };
 
+  const selectedWeek =
+    weeklyPlan.find((week) => week.week === selectedWeekNumber) ??
+    weeklyPlan[0];
+  const selectedTopicIndex = Math.min(
+    activeTopicIndex,
+    selectedWeek.topics.length - 1,
+  );
+  const selectedTopic = selectedWeek.topics[selectedTopicIndex];
+  const selectedTopicKey = `${selectedWeek.week}-t-${selectedTopicIndex}`;
+
   const tabDefs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
     {
       key: "topics",
       label: "Topics",
       icon: <MenuBookIcon sx={{ fontSize: 16 }} />,
-    },
-    {
-      key: "theory",
-      label: "Theory",
-      icon: <QuizIcon sx={{ fontSize: 16 }} />,
     },
     {
       key: "coding",
@@ -1164,88 +1503,238 @@ const WeeklyStudyPlan = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        backgroundColor: "#f4f7fb",
-        py: { xs: 4, md: 6 },
+        background:
+          "radial-gradient(circle at 8% 0%, rgba(99,102,241,0.16), transparent 30rem), radial-gradient(circle at 92% 18%, rgba(236,72,153,0.08), transparent 24rem), #f6f7fc",
+        py: { xs: 2, md: 4 },
         px: { xs: 2, sm: 3, md: 4 },
       }}
     >
       <Box
         sx={{
-          maxWidth: 900,
+          maxWidth: 1120,
           mx: "auto",
-          backgroundColor: "#ffffff",
-          borderRadius: 4,
-          boxShadow: "0 24px 80px rgba(15,23,42,0.10)",
-          p: { xs: 3, md: 5 },
+          backgroundColor: "transparent",
+          p: 0,
         }}
       >
-        {/* Back */}
-        <Button
-          variant="outlined"
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate(-1)}
+        <Box
           sx={{
+            position: "relative",
+            overflow: "hidden",
             mb: 3,
-            borderRadius: "10px",
-            textTransform: "none",
-            borderColor: "divider",
-            color: "text.secondary",
-            fontWeight: 600,
-            "&:hover": { borderColor: "primary.main", color: "primary.main" },
+            p: { xs: 2.5, sm: 4, md: 5 },
+            borderRadius: { xs: 3, md: 4 },
+            color: "#fff",
+            background:
+              "linear-gradient(125deg, #312e81 0%, #4f46e5 48%, #7c3aed 100%)",
+            boxShadow: "0 22px 55px rgba(79,70,229,0.26)",
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              width: 290,
+              height: 290,
+              right: { xs: -150, md: -40 },
+              top: -150,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.10)",
+              pointerEvents: "none",
+            },
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              width: 180,
+              height: 180,
+              right: { xs: 60, md: 220 },
+              bottom: -135,
+              borderRadius: "50%",
+              background: "rgba(244,114,182,0.18)",
+              pointerEvents: "none",
+            },
           }}
         >
-          Back to Roadmap
-        </Button>
+          <Box sx={{ position: "relative", zIndex: 1 }}>
+            <Button
+              variant="outlined"
+              startIcon={<ArrowBackIcon />}
+              onClick={() => navigate(-1)}
+              sx={{
+                mb: { xs: 3, sm: 4 },
+                borderRadius: 2,
+                textTransform: "none",
+                borderColor: "rgba(255,255,255,0.42)",
+                color: "rgba(255,255,255,0.92)",
+                fontWeight: 600,
+                "&:hover": {
+                  borderColor: "#fff",
+                  backgroundColor: "rgba(255,255,255,0.10)",
+                },
+              }}
+            >
+              Back to Roadmap
+            </Button>
 
-        {/* Header */}
-        <Chip
-          label="10-Week Plan"
-          size="small"
-          sx={{
-            mb: 1.5,
-            backgroundColor: "rgba(85,111,255,0.10)",
-            color: "#556FFF",
-            fontWeight: 600,
-            fontSize: 12,
-          }}
-        />
-        <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
-          Weekly Study Plan
-        </Typography>
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{ mb: 3, maxWidth: 620 }}
-        >
-          Work through each week at your own pace. Check off topics, answer
-          theory questions, complete coding tasks, and keep notes — all in one
-          place.
-        </Typography>
+            <Chip
+              icon={<MenuBookIcon sx={{ color: "inherit !important" }} />}
+              label="YOUR 24-WEEK JAVA JOURNEY"
+              size="small"
+              sx={{
+                mb: 1.5,
+                backgroundColor: "rgba(255,255,255,0.15)",
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: 11,
+                letterSpacing: "0.08em",
+                "& .MuiChip-icon": { ml: 1 },
+              }}
+            />
+            <Typography
+              variant="h3"
+              sx={{
+                maxWidth: 740,
+                fontWeight: 850,
+                mb: 1.25,
+                letterSpacing: "-0.045em",
+                lineHeight: 1.08,
+                fontSize: { xs: "2.15rem", sm: "2.8rem", md: "3.25rem" },
+              }}
+            >
+              Build your Java skills.
+              <Box component="span" sx={{ color: "#fbcfe8" }}>
+                {" "}
+                One week at a time.
+              </Box>
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                mb: 2.5,
+                maxWidth: 660,
+                color: "rgba(255,255,255,0.82)",
+                lineHeight: 1.75,
+                fontSize: { xs: 14, sm: 16 },
+              }}
+            >
+              From Java fundamentals to a production-ready backend project.
+              Learn by doing, celebrate the small wins, and keep your momentum
+              going.
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                flexWrap: "wrap",
+              }}
+            >
+              {["24 weeks", "Hands-on practice", "Your own pace"].map(
+                (item) => (
+                  <Chip
+                    key={item}
+                    label={item}
+                    size="small"
+                    sx={{
+                      color: "rgba(255,255,255,0.92)",
+                      backgroundColor: "rgba(255,255,255,0.11)",
+                      border: "1px solid rgba(255,255,255,0.16)",
+                      fontWeight: 600,
+                    }}
+                  />
+                ),
+              )}
+              <Button
+                variant="contained"
+                endIcon={<PlayArrowIcon />}
+                onClick={() => {
+                  selectWeek(1);
+                  document
+                    .getElementById("study-workspace")
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                sx={{
+                  ml: { xs: 0, sm: 1 },
+                  px: 2.25,
+                  py: 1,
+                  borderRadius: 2,
+                  color: "#4338ca",
+                  backgroundColor: "#fff",
+                  textTransform: "none",
+                  fontWeight: 800,
+                  boxShadow: "0 8px 20px rgba(30,27,75,0.20)",
+                  "&:hover": {
+                    backgroundColor: "#f5f3ff",
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 10px 24px rgba(30,27,75,0.25)",
+                  },
+                }}
+              >
+                Start week 1
+              </Button>
+            </Box>
+          </Box>
+        </Box>
 
         {/* Overall progress */}
         <Box
           sx={{
-            p: 2.5,
+            p: { xs: 2, sm: 2.5, md: 3 },
             borderRadius: 3,
-            background:
-              "linear-gradient(135deg, rgba(85,111,255,0.06) 0%, rgba(16,185,129,0.06) 100%)",
-            border: "1.5px solid rgba(85,111,255,0.12)",
-            mb: 4,
+            background: "linear-gradient(135deg, #fff 0%, #f5f3ff 100%)",
+            border: "1px solid rgba(99,102,241,0.12)",
+            mb: 3.5,
             display: "flex",
             alignItems: "center",
-            gap: 3,
+            gap: { xs: 1.5, sm: 3 },
             flexWrap: "wrap",
+            boxShadow: "0 12px 30px rgba(49,46,129,0.07)",
           }}
         >
-          <EmojiEventsIcon sx={{ color: "#556FFF", fontSize: 32 }} />
+          <Box
+            sx={{
+              width: 52,
+              height: 52,
+              display: "grid",
+              placeItems: "center",
+              borderRadius: 2.5,
+              color: "#fff",
+              background: "linear-gradient(145deg, #f59e0b, #f97316)",
+              boxShadow: "0 8px 18px rgba(249,115,22,0.24)",
+            }}
+          >
+            <EmojiEventsIcon sx={{ fontSize: 28 }} />
+          </Box>
           <Box sx={{ flex: 1, minWidth: 180 }}>
             <Box
-              sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 0.75,
+                gap: 1,
+                flexWrap: "wrap",
+              }}
             >
-              <Typography>Overall topic progress</Typography>
+              <Box>
+                <Typography sx={{ fontWeight: 800, color: "#1e1b4b" }}>
+                  Your progress
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {overallProgress === 0
+                    ? "Every expert starts with one small step."
+                    : overallProgress === 100
+                      ? "Incredible work — you completed the whole plan!"
+                      : "Nice momentum. Keep stacking those wins!"}
+                </Typography>
+              </Box>
               <Typography
                 variant="body2"
-                sx={{ fontWeight: 700, color: "#556FFF" }}
+                sx={{
+                  px: 1.25,
+                  py: 0.5,
+                  borderRadius: 99,
+                  fontWeight: 800,
+                  color: "#4f46e5",
+                  backgroundColor: "rgba(99,102,241,0.10)",
+                }}
               >
                 {doneTopics}/{totalTopics} topics
               </Typography>
@@ -1256,524 +1745,726 @@ const WeeklyStudyPlan = () => {
               sx={{
                 height: 8,
                 borderRadius: 99,
-                backgroundColor: "rgba(85,111,255,0.12)",
+                backgroundColor: "rgba(99,102,241,0.12)",
                 "& .MuiLinearProgress-bar": {
-                  backgroundColor: "#556FFF",
+                  background:
+                    "linear-gradient(90deg, #6366f1, #a855f7, #ec4899)",
                   borderRadius: 99,
                 },
               }}
             />
           </Box>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: "#556FFF" }}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 900,
+              color: "#4f46e5",
+              letterSpacing: "-0.05em",
+            }}
+          >
             {overallProgress}%
           </Typography>
         </Box>
 
-        {/* Week cards */}
-        {weeklyPlan.map((w) => {
-          const wp = weekProgress(w.week);
-          const tab = getTab(w.week);
-
-          return (
-            <Accordion
-              key={w.week}
-              expanded={expandedWeek === w.week}
-              onChange={(_, open) => setExpandedWeek(open ? w.week : false)}
-              disableGutters
-              elevation={0}
+        {/* Study workspace */}
+        <Box
+          id="study-workspace"
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "280px minmax(0, 1fr)" },
+            gap: 2.5,
+            alignItems: "start",
+          }}
+        >
+          <Box
+            component="nav"
+            aria-label="Study plan weeks"
+            sx={{
+              position: { md: "sticky" },
+              top: 20,
+              p: 1.5,
+              borderRadius: 3,
+              border: "1px solid rgba(99,102,241,0.12)",
+              background: "rgba(255,255,255,0.94)",
+              boxShadow: "0 12px 30px rgba(49,46,129,0.06)",
+            }}
+          >
+            <Box sx={{ px: 0.75, pt: 0.5, pb: 1.25 }}>
+              <Typography sx={{ fontWeight: 800, color: "#1e1b4b" }}>
+                Your 24-week journey
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Choose a week to explore
+              </Typography>
+            </Box>
+            <Stack
+              spacing={0.75}
               sx={{
-                mb: 2,
-                borderRadius: "16px !important",
-                border:
-                  expandedWeek === w.week
-                    ? `2px solid ${w.color}`
-                    : "1.5px solid rgba(15,23,42,0.08)",
-                overflow: "hidden",
-                "&::before": { display: "none" },
-                transition: "border .2s",
+                maxHeight: { xs: 330, md: "calc(100vh - 200px)" },
+                overflowY: "auto",
+                pr: 0.5,
               }}
             >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                sx={{
-                  px: 2.5,
-                  py: 1,
-                  "& .MuiAccordionSummary-content": {
-                    alignItems: "center",
-                    gap: 2,
-                  },
-                }}
-              >
-                {/* Week badge */}
-                <Box
-                  sx={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: "12px",
-                    backgroundColor: `${w.color}18`,
-                    color: w.color,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: 800,
-                    fontSize: 13,
-                    flexShrink: 0,
-                  }}
-                >
-                  W{w.week}
-                </Box>
+              {weeklyPlan.map((week) => {
+                const progress = weekProgress(week.week);
+                const isSelected = selectedWeek.week === week.week;
 
-                <Box sx={{ flex: 1 }}>
-                  <Box
+                return (
+                  <Button
+                    key={week.week}
+                    fullWidth
+                    aria-pressed={isSelected}
+                    onClick={() => selectWeek(week.week)}
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                      {w.title}
-                    </Typography>
-                    <Chip
-                      label={`Phase ${w.phase}`}
-                      size="small"
-                      sx={{
-                        height: 20,
-                        fontSize: 11,
-                        fontWeight: 600,
-                        backgroundColor: `${w.color}18`,
-                        color: w.color,
-                      }}
-                    />
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1.5,
-                      mt: 0.5,
-                    }}
-                  >
-                    <LinearProgress
-                      variant="determinate"
-                      value={wp}
-                      sx={{
-                        width: 100,
-                        height: 5,
-                        borderRadius: 99,
-                        backgroundColor: "rgba(15,23,42,0.08)",
-                        "& .MuiLinearProgress-bar": {
-                          backgroundColor: w.color,
-                          borderRadius: 99,
-                        },
-                      }}
-                    />
-                    <Typography variant="caption" color="text.secondary">
-                      {wp}% topics done
-                    </Typography>
-                  </Box>
-                </Box>
-              </AccordionSummary>
-
-              <AccordionDetails sx={{ px: 2.5, pb: 2.5, pt: 0 }}>
-                <Divider sx={{ mb: 2 }} />
-
-                {/* Tabs */}
-                <Tabs
-                  value={tab}
-                  onChange={(_, v) => setTab(w.week, v)}
-                  variant="scrollable"
-                  scrollButtons="auto"
-                  sx={{
-                    mb: 2,
-                    minHeight: 36,
-                    "& .MuiTab-root": {
-                      minHeight: 36,
+                      justifyContent: "flex-start",
+                      px: 1,
+                      py: 1,
+                      borderRadius: 2,
+                      border: "1px solid",
+                      borderColor: isSelected
+                        ? `${week.color}50`
+                        : "transparent",
+                      color: "text.primary",
+                      backgroundColor: isSelected
+                        ? `${week.color}0d`
+                        : "transparent",
+                      textAlign: "left",
                       textTransform: "none",
-                      fontWeight: 600,
-                      fontSize: 13,
-                      gap: 0.5,
-                    },
-                    "& .MuiTabs-indicator": { backgroundColor: w.color },
-                    "& .Mui-selected": { color: `${w.color} !important` },
+                      "&:hover": {
+                        backgroundColor: `${week.color}10`,
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.25,
+                        width: "100%",
+                        minWidth: 0,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 38,
+                          height: 38,
+                          flexShrink: 0,
+                          display: "grid",
+                          placeItems: "center",
+                          borderRadius: 1.75,
+                          color: week.color,
+                          background: `linear-gradient(145deg, ${week.color}24, ${week.color}10)`,
+                          fontSize: 11,
+                          fontWeight: 800,
+                        }}
+                      >
+                        W{String(week.week).padStart(2, "0")}
+                      </Box>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            display: "block",
+                            overflow: "hidden",
+                            fontWeight: isSelected ? 800 : 600,
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {week.title}
+                        </Typography>
+                        <LinearProgress
+                          variant="determinate"
+                          value={progress}
+                          sx={{
+                            mt: 0.75,
+                            height: 4,
+                            borderRadius: 99,
+                            backgroundColor: `${week.color}18`,
+                            "& .MuiLinearProgress-bar": {
+                              backgroundColor: week.color,
+                              borderRadius: 99,
+                            },
+                          }}
+                        />
+                      </Box>
+                      {progress === 100 && (
+                        <CheckCircleIcon
+                          sx={{ flexShrink: 0, color: "#059669", fontSize: 18 }}
+                        />
+                      )}
+                    </Box>
+                  </Button>
+                );
+              })}
+            </Stack>
+          </Box>
+
+          <Box id="selected-week-content" sx={{ minWidth: 0 }}>
+            {[selectedWeek].map((w) => {
+              const wp = weekProgress(w.week);
+              const tab = getTab(w.week);
+
+              return (
+                <Box
+                  key={w.week}
+                  id={`study-week-${w.week}`}
+                  sx={{
+                    overflow: "hidden",
+                    borderRadius: 3,
+                    border: `1px solid ${w.color}30`,
+                    backgroundColor: "#fff",
+                    boxShadow: "0 16px 38px rgba(49,46,129,0.08)",
                   }}
                 >
-                  {tabDefs.map((t) => (
-                    <Tab
-                      key={t.key}
-                      value={t.key}
-                      label={t.label}
-                      iconPosition="start"
-                    />
-                  ))}
-                </Tabs>
-
-                {/* ── Topics ── */}
-                {tab === "topics" && (
-                  <Box>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ mb: 1.5, display: "block" }}
-                    >
-                      Check each topic once you've studied it.
-                    </Typography>
-                    <Grid container spacing={0.5}>
-                      {w.topics.map((topic, i) => {
-                        const key = `${w.week}-t-${i}`;
-                        const guideKey = `${w.week}-${i}`;
-                        return (
-                          <Grid key={i} size={{ xs: 12 }}>
-                            <Box
-                              onClick={() => toggleTopic(key)}
-                              sx={{
-                                display: "flex",
-                                alignItems: "flex-start",
-                                gap: 1,
-                                p: 1,
-                                borderRadius: 2,
-                                cursor: "pointer",
-                                "&:hover": {
-                                  backgroundColor: "rgba(15,23,42,0.03)",
-                                },
-                              }}
-                            >
-                              {checkedTopics[key] ? (
-                                <CheckCircleIcon
-                                  sx={{
-                                    color: w.color,
-                                    fontSize: 20,
-                                    mt: 0.1,
-                                    flexShrink: 0,
-                                  }}
-                                />
-                              ) : (
-                                <RadioButtonUncheckedIcon
-                                  sx={{
-                                    color: "action.disabled",
-                                    fontSize: 20,
-                                    mt: 0.1,
-                                    flexShrink: 0,
-                                  }}
-                                />
-                              )}
-                              <Typography
-                                variant="body2"
-                                sx={{
-                                  color: checkedTopics[key]
-                                    ? "text.disabled"
-                                    : "text.primary",
-                                  textDecoration: checkedTopics[key]
-                                    ? "line-through"
-                                    : "none",
-                                  lineHeight: 1.5,
-                                }}
-                              >
-                                {topic}
-                              </Typography>
-                            </Box>
-                            <TopicGuidePanel
-                              guideKey={guideKey}
-                              color={w.color}
-                              completed={!!checkedTopics[key]}
-                              onComplete={() => toggleTopic(key)}
-                            />
-                          </Grid>
-                        );
-                      })}
-                    </Grid>
-                  </Box>
-                )}
-
-                {/* ── Theory ── */}
-                {tab === "theory" && (
-                  <Box>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ mb: 1.5, display: "block" }}
-                    >
-                      Answer these in your own words. Check off once you can
-                      explain them confidently.
-                    </Typography>
-                    {w.theoretical.map((q, i) => {
-                      const key = `${w.week}-q-${i}`;
-                      return (
-                        <Box
-                          key={i}
-                          sx={{
-                            display: "flex",
-                            alignItems: "flex-start",
-                            gap: 1.5,
-                            p: 1.5,
-                            mb: 1,
-                            borderRadius: 2,
-                            border: "1.5px solid",
-                            borderColor: checkedTheory[key]
-                              ? `${w.color}40`
-                              : "rgba(15,23,42,0.08)",
-                            backgroundColor: checkedTheory[key]
-                              ? `${w.color}06`
-                              : "transparent",
-                            transition: "all .15s",
-                          }}
-                        >
-                          <Checkbox
-                            checked={!!checkedTheory[key]}
-                            onChange={() => toggleTheory(key)}
-                            size="small"
-                            sx={{
-                              p: 0,
-                              color: "action.disabled",
-                              "&.Mui-checked": { color: w.color },
-                            }}
-                          />
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              color: checkedTheory[key]
-                                ? "text.disabled"
-                                : "text.primary",
-                              textDecoration: checkedTheory[key]
-                                ? "line-through"
-                                : "none",
-                              lineHeight: 1.6,
-                            }}
-                          >
-                            {q}
-                          </Typography>
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                )}
-
-                {/* ── Coding ── */}
-                {tab === "coding" && (
-                  <Box>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ mb: 1.5, display: "block" }}
-                    >
-                      Complete each challenge in your IDE, or hit "Practice" to
-                      try it right here.
-                    </Typography>
-                    {w.coding.map((challenge, i) => {
-                      const key = `${w.week}-c-${i}`;
-                      return (
-                        <Box
-                          key={i}
-                          sx={{
-                            display: "flex",
-                            alignItems: "flex-start",
-                            gap: 1.5,
-                            p: 1.5,
-                            mb: 1,
-                            borderRadius: 2,
-                            border: "1.5px solid",
-                            borderColor: checkedCoding[key]
-                              ? `${w.color}40`
-                              : "rgba(15,23,42,0.08)",
-                            backgroundColor: checkedCoding[key]
-                              ? `${w.color}06`
-                              : "transparent",
-                            transition: "all .15s",
-                          }}
-                        >
-                          <Checkbox
-                            checked={!!checkedCoding[key]}
-                            onChange={() => toggleCoding(key)}
-                            size="small"
-                            sx={{
-                              p: 0,
-                              color: "action.disabled",
-                              "&.Mui-checked": { color: w.color },
-                            }}
-                          />
-                          <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
-                                mb: 0.5,
-                                flexWrap: "wrap",
-                                justifyContent: "space-between",
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 1,
-                                }}
-                              >
-                                <CodeIcon
-                                  sx={{ fontSize: 15, color: w.color }}
-                                />
-                                <Typography
-                                  variant="caption"
-                                  sx={{ color: w.color, fontWeight: 700 }}
-                                >
-                                  Challenge {i + 1}
-                                </Typography>
-                              </Box>
-                              <Button
-                                size="small"
-                                startIcon={
-                                  <PlayArrowIcon sx={{ fontSize: 16 }} />
-                                }
-                                onClick={() =>
-                                  openPractice(
-                                    w.week,
-                                    i,
-                                    w.color,
-                                    w.title,
-                                    challenge,
-                                  )
-                                }
-                                sx={{
-                                  fontSize: 11,
-                                  textTransform: "none",
-                                  fontWeight: 700,
-                                  color: w.color,
-                                  border: `1.5px solid ${w.color}40`,
-                                  borderRadius: 99,
-                                  px: 1.25,
-                                  py: 0.25,
-                                  minWidth: 0,
-                                  "&:hover": {
-                                    backgroundColor: `${w.color}10`,
-                                    borderColor: w.color,
-                                  },
-                                }}
-                              >
-                                Practice
-                              </Button>
-                            </Box>
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                color: checkedCoding[key]
-                                  ? "text.disabled"
-                                  : "text.primary",
-                                textDecoration: checkedCoding[key]
-                                  ? "line-through"
-                                  : "none",
-                                lineHeight: 1.6,
-                              }}
-                            >
-                              {challenge}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                )}
-
-                {/* ── Resources ── */}
-                {tab === "resources" && (
-                  <Box>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ mb: 1.5, display: "block" }}
-                    >
-                      Curated reading and practice links for this week.
-                    </Typography>
-                    <Grid container spacing={1.5}>
-                      {w.resources.map((r, i) => (
-                        <Grid key={i} size={{ xs: 12, sm: 6 }}>
-                          <Box
-                            component="a"
-                            href={r.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1.5,
-                              p: 1.5,
-                              borderRadius: 2,
-                              border: "1.5px solid rgba(15,23,42,0.08)",
-                              textDecoration: "none",
-                              color: "text.primary",
-                              transition: "all .15s",
-                              "&:hover": {
-                                borderColor: w.color,
-                                backgroundColor: `${w.color}06`,
-                                transform: "translateY(-2px)",
-                                boxShadow: "0 4px 16px rgba(15,23,42,0.06)",
-                              },
-                            }}
-                          >
-                            <LinkIcon
-                              sx={{
-                                color: w.color,
-                                fontSize: 18,
-                                flexShrink: 0,
-                              }}
-                            />
-                            <Typography
-                              variant="body2"
-                              sx={{ fontWeight: 500, lineHeight: 1.4 }}
-                            >
-                              {r.label}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Box>
-                )}
-
-                {/* ── Notes ── */}
-                {tab === "notes" && (
-                  <Box>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ mb: 1.5, display: "block" }}
-                    >
-                      Write your own study notes, questions, or key takeaways
-                      here.
-                    </Typography>
-                    <TextField
-                      multiline
-                      minRows={5}
-                      fullWidth
-                      placeholder="Type your notes here... e.g., key concepts, things to revisit, questions for later."
-                      value={notes[w.week] ?? ""}
-                      onChange={(e) =>
-                        setNotes((p) => ({ ...p, [w.week]: e.target.value }))
-                      }
+                  <Box
+                    component="header"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: { xs: 1.5, sm: 2 },
+                      px: { xs: 1.75, sm: 2.5 },
+                      py: { xs: 2, sm: 2.5 },
+                      background: `linear-gradient(110deg, ${w.color}14, #fff 76%)`,
+                    }}
+                  >
+                    <Box
                       sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: 2,
-                          fontSize: 14,
-                          "&:hover fieldset": { borderColor: w.color },
-                          "&.Mui-focused fieldset": { borderColor: w.color },
-                        },
+                        width: { xs: 48, sm: 56 },
+                        height: { xs: 48, sm: 56 },
+                        flexShrink: 0,
+                        display: "grid",
+                        placeItems: "center",
+                        borderRadius: 2.5,
+                        color: w.color,
+                        background: `linear-gradient(145deg, ${w.color}2c, ${w.color}12)`,
+                        boxShadow: `inset 0 0 0 1px ${w.color}18`,
+                        fontWeight: 900,
                       }}
-                    />
-                    {notes[w.week] && (
+                    >
+                      W{String(w.week).padStart(2, "0")}
+                    </Box>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.75,
+                          flexWrap: "wrap",
+                          mb: 0.5,
+                        }}
+                      >
+                        <Chip
+                          label={`Phase ${w.phase}`}
+                          size="small"
+                          sx={{
+                            height: 22,
+                            color: w.color,
+                            backgroundColor: `${w.color}16`,
+                            fontSize: 11,
+                            fontWeight: 700,
+                          }}
+                        />
+                        <Typography variant="caption" color="text.secondary">
+                          {w.days} · {w.topics.length} topics
+                        </Typography>
+                      </Box>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "#1e1b4b",
+                          fontWeight: 850,
+                          letterSpacing: "-0.025em",
+                          lineHeight: 1.25,
+                        }}
+                      >
+                        {w.title}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: { xs: "none", sm: "block" },
+                        minWidth: 100,
+                      }}
+                    >
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ mt: 1, display: "block" }}
+                        sx={{ display: "block", mb: 0.5, textAlign: "right" }}
                       >
-                        {notes[w.week].length} characters saved in session.
+                        {wp}% complete
                       </Typography>
+                      <LinearProgress
+                        variant="determinate"
+                        value={wp}
+                        sx={{
+                          height: 6,
+                          borderRadius: 99,
+                          backgroundColor: `${w.color}18`,
+                          "& .MuiLinearProgress-bar": {
+                            backgroundColor: w.color,
+                            borderRadius: 99,
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ p: { xs: 1.5, sm: 2.5 } }}>
+                    <Divider sx={{ mb: 2 }} />
+
+                    {/* Tabs */}
+                    <Tabs
+                      value={tab}
+                      onChange={(_, v) => setTab(w.week, v)}
+                      variant="scrollable"
+                      scrollButtons="auto"
+                      sx={{
+                        mb: 2,
+                        minHeight: 44,
+                        p: 0.5,
+                        borderRadius: 2.5,
+                        backgroundColor: `${w.color}08`,
+                        "& .MuiTabs-flexContainer": { gap: 0.5 },
+                        "& .MuiTab-root": {
+                          minHeight: 40,
+                          textTransform: "none",
+                          fontWeight: 600,
+                          fontSize: 13,
+                          gap: 0.5,
+                          px: { xs: 1.25, sm: 1.75 },
+                          borderRadius: 2,
+                          color: "text.secondary",
+                          transition: "background .15s, color .15s",
+                          "&:hover": {
+                            color: w.color,
+                            backgroundColor: `${w.color}0d`,
+                          },
+                          "&.Mui-selected": {
+                            color: "#fff !important",
+                            backgroundColor: w.color,
+                            boxShadow: `0 4px 10px ${w.color}30`,
+                          },
+                        },
+                        "& .MuiTabs-indicator": { display: "none" },
+                      }}
+                    >
+                      {tabDefs.map((t) => (
+                        <Tab
+                          key={t.key}
+                          value={t.key}
+                          label={t.label}
+                          iconPosition="start"
+                        />
+                      ))}
+                    </Tabs>
+
+                    {/* ── Topics ── */}
+                    {tab === "topics" && (
+                      <Box sx={{ display: "grid", gap: 2 }}>
+                        <Box
+                          sx={{
+                            p: { xs: 2, sm: 3 },
+                            border: `1px solid ${w.color}28`,
+                            borderRadius: 2.5,
+                            background: `linear-gradient(145deg, ${w.color}0c, #fff 75%)`,
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              gap: 1,
+                              mb: 1.5,
+                            }}
+                          >
+                            <Typography
+                              variant="overline"
+                              sx={{
+                                color: w.color,
+                                fontWeight: 800,
+                                letterSpacing: "0.1em",
+                              }}
+                            >
+                              Topic{" "}
+                              {String(selectedTopicIndex + 1).padStart(2, "0")}
+                            </Typography>
+                            <Chip
+                              label={`${selectedTopicIndex + 1} of ${w.topics.length}`}
+                              size="small"
+                              sx={{
+                                color: w.color,
+                                backgroundColor: `${w.color}12`,
+                                fontWeight: 700,
+                              }}
+                            />
+                          </Box>
+                          <Typography
+                            variant="h5"
+                            sx={{
+                              mb: 1.5,
+                              color: "#1e1b4b",
+                              fontWeight: 800,
+                              letterSpacing: "-0.025em",
+                            }}
+                          >
+                            {selectedTopic}
+                          </Typography>
+                          <LinearProgress
+                            variant="determinate"
+                            value={
+                              ((selectedTopicIndex + 1) / w.topics.length) * 100
+                            }
+                            sx={{
+                              height: 6,
+                              borderRadius: 99,
+                              backgroundColor: `${w.color}18`,
+                              "& .MuiLinearProgress-bar": {
+                                backgroundColor: w.color,
+                                borderRadius: 99,
+                              },
+                            }}
+                          />
+                          <TopicGuidePanel
+                            key={`${w.week}-${selectedTopicIndex}`}
+                            guideKey={`${w.week}-${selectedTopicIndex}`}
+                            color={w.color}
+                          />
+                        </Box>
+
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: 1,
+                            flexWrap: "wrap",
+                            pt: 0.5,
+                          }}
+                        >
+                          <Button
+                            variant="outlined"
+                            startIcon={<ArrowBackIcon />}
+                            disabled={selectedTopicIndex === 0}
+                            onClick={() =>
+                              setActiveTopicIndex((index) =>
+                                Math.max(0, index - 1),
+                              )
+                            }
+                            sx={{
+                              borderRadius: 2,
+                              textTransform: "none",
+                              fontWeight: 700,
+                              borderColor: `${w.color}45`,
+                              color: w.color,
+                              "&:hover": {
+                                borderColor: w.color,
+                                backgroundColor: `${w.color}08`,
+                              },
+                            }}
+                          >
+                            Previous
+                          </Button>
+                          <Button
+                            variant={
+                              checkedTopics[selectedTopicKey]
+                                ? "outlined"
+                                : "contained"
+                            }
+                            startIcon={<CheckCircleIcon />}
+                            disabled={!!checkedTopics[selectedTopicKey]}
+                            onClick={() => toggleTopic(selectedTopicKey)}
+                            sx={{
+                              borderRadius: 2,
+                              px: 2.5,
+                              textTransform: "none",
+                              fontWeight: 800,
+                              color: checkedTopics[selectedTopicKey]
+                                ? "#047857"
+                                : "#fff",
+                              borderColor: "#10b981",
+                              backgroundColor: checkedTopics[selectedTopicKey]
+                                ? "#ecfdf5"
+                                : "#10b981",
+                              "&:hover": {
+                                borderColor: "#059669",
+                                backgroundColor: checkedTopics[selectedTopicKey]
+                                  ? "#d1fae5"
+                                  : "#059669",
+                              },
+                            }}
+                          >
+                            {checkedTopics[selectedTopicKey]
+                              ? "Completed"
+                              : "Complete"}
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            endIcon={<ArrowForwardIcon />}
+                            disabled={
+                              selectedTopicIndex === w.topics.length - 1
+                            }
+                            onClick={() =>
+                              setActiveTopicIndex((index) =>
+                                Math.min(w.topics.length - 1, index + 1),
+                              )
+                            }
+                            sx={{
+                              borderRadius: 2,
+                              textTransform: "none",
+                              fontWeight: 700,
+                              borderColor: `${w.color}45`,
+                              color: w.color,
+                              "&:hover": {
+                                borderColor: w.color,
+                                backgroundColor: `${w.color}08`,
+                              },
+                            }}
+                          >
+                            Next
+                          </Button>
+                        </Box>
+                      </Box>
+                    )}
+
+                    {/* ── Coding ── */}
+                    {tab === "coding" && (
+                      <Box>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mb: 1.5, display: "block" }}
+                        >
+                          Complete each challenge in your IDE, or hit "Practice"
+                          to try it right here.
+                        </Typography>
+                        {w.coding.map((challenge, i) => {
+                          const key = `${w.week}-c-${i}`;
+                          return (
+                            <Box
+                              key={i}
+                              sx={{
+                                display: "flex",
+                                alignItems: "flex-start",
+                                gap: 1.5,
+                                p: 1.5,
+                                mb: 1,
+                                borderRadius: 2,
+                                border: "1.5px solid",
+                                borderColor: checkedCoding[key]
+                                  ? `${w.color}40`
+                                  : "rgba(15,23,42,0.08)",
+                                backgroundColor: checkedCoding[key]
+                                  ? `${w.color}06`
+                                  : "#fff",
+                                boxShadow: "0 2px 8px rgba(15,23,42,0.025)",
+                                transition: "all .18s",
+                                "&:hover": {
+                                  borderColor: `${w.color}65`,
+                                  boxShadow: `0 5px 14px ${w.color}10`,
+                                },
+                              }}
+                            >
+                              <Checkbox
+                                checked={!!checkedCoding[key]}
+                                onChange={() => toggleCoding(key)}
+                                size="small"
+                                sx={{
+                                  p: 0,
+                                  color: "action.disabled",
+                                  "&.Mui-checked": { color: w.color },
+                                }}
+                              />
+                              <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                    mb: 0.5,
+                                    flexWrap: "wrap",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 1,
+                                    }}
+                                  >
+                                    <CodeIcon
+                                      sx={{ fontSize: 15, color: w.color }}
+                                    />
+                                    <Typography
+                                      variant="caption"
+                                      sx={{ color: w.color, fontWeight: 700 }}
+                                    >
+                                      Challenge {i + 1}
+                                    </Typography>
+                                  </Box>
+                                  <Button
+                                    size="small"
+                                    startIcon={
+                                      <PlayArrowIcon sx={{ fontSize: 16 }} />
+                                    }
+                                    onClick={() =>
+                                      openPractice(
+                                        w.week,
+                                        i,
+                                        w.color,
+                                        w.title,
+                                        challenge,
+                                      )
+                                    }
+                                    sx={{
+                                      fontSize: 11,
+                                      textTransform: "none",
+                                      fontWeight: 700,
+                                      color: w.color,
+                                      border: `1.5px solid ${w.color}40`,
+                                      borderRadius: 99,
+                                      px: 1.25,
+                                      py: 0.25,
+                                      minWidth: 0,
+                                      "&:hover": {
+                                        backgroundColor: `${w.color}10`,
+                                        borderColor: w.color,
+                                      },
+                                    }}
+                                  >
+                                    Practice
+                                  </Button>
+                                </Box>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    color: checkedCoding[key]
+                                      ? "text.disabled"
+                                      : "text.primary",
+                                    textDecoration: checkedCoding[key]
+                                      ? "line-through"
+                                      : "none",
+                                    lineHeight: 1.6,
+                                  }}
+                                >
+                                  {challenge}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                    )}
+
+                    {/* ── Resources ── */}
+                    {tab === "resources" && (
+                      <Box>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mb: 1.5, display: "block" }}
+                        >
+                          Curated reading and practice links for this week.
+                        </Typography>
+                        <Grid container spacing={1.5}>
+                          {w.resources.map((r, i) => (
+                            <Grid key={i} size={{ xs: 12, sm: 6 }}>
+                              <Box
+                                component="a"
+                                href={r.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1.5,
+                                  p: 1.5,
+                                  borderRadius: 2,
+                                  border: "1.5px solid rgba(15,23,42,0.08)",
+                                  textDecoration: "none",
+                                  color: "text.primary",
+                                  transition: "all .15s",
+                                  "&:hover": {
+                                    borderColor: w.color,
+                                    backgroundColor: `${w.color}06`,
+                                    transform: "translateY(-2px)",
+                                    boxShadow: "0 4px 16px rgba(15,23,42,0.06)",
+                                  },
+                                }}
+                              >
+                                <LinkIcon
+                                  sx={{
+                                    color: w.color,
+                                    fontSize: 18,
+                                    flexShrink: 0,
+                                  }}
+                                />
+                                <Typography
+                                  variant="body2"
+                                  sx={{ fontWeight: 500, lineHeight: 1.4 }}
+                                >
+                                  {r.label}
+                                </Typography>
+                              </Box>
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </Box>
+                    )}
+
+                    {/* ── Notes ── */}
+                    {tab === "notes" && (
+                      <Box>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mb: 1.5, display: "block" }}
+                        >
+                          Write your own study notes, questions, or key
+                          takeaways here.
+                        </Typography>
+                        <TextField
+                          multiline
+                          minRows={5}
+                          fullWidth
+                          placeholder="Type your notes here... e.g., key concepts, things to revisit, questions for later."
+                          value={notes[w.week] ?? ""}
+                          onChange={(e) =>
+                            setNotes((p) => ({
+                              ...p,
+                              [w.week]: e.target.value,
+                            }))
+                          }
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                              fontSize: 14,
+                              "&:hover fieldset": { borderColor: w.color },
+                              "&.Mui-focused fieldset": {
+                                borderColor: w.color,
+                              },
+                            },
+                          }}
+                        />
+                        {notes[w.week] && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ mt: 1, display: "block" }}
+                          >
+                            {notes[w.week].length} characters saved in session.
+                          </Typography>
+                        )}
+                      </Box>
                     )}
                   </Box>
-                )}
-              </AccordionDetails>
-            </Accordion>
-          );
-        })}
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
 
         {/* Bottom CTA */}
         <Box sx={{ textAlign: "center", mt: 4 }}>

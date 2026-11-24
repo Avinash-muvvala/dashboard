@@ -23,7 +23,10 @@ type CategoryType =
   | "React"
   | "HTML/CSS"
   | "Database"
-  | "Full Stack";
+  | "Full Stack"
+  | "Automation Testing"
+  | "API Testing"
+  | "Selenium";
 type PostKind = "Topics" | "Questions" | "Guide";
 
 interface Post {
@@ -111,6 +114,27 @@ const posts: Post[] = [
     kind: "Questions",
     route: "/sql-practice",
   },
+  {
+    title: "Playwright",
+    description: "Questions",
+    category: "Automation Testing",
+    kind: "Questions",
+    route: "/playwright-practice",
+  },
+  {
+    title: "API Testing",
+    description: "Questions",
+    category: "API Testing",
+    kind: "Questions",
+    route: "/api-testing-practice",
+  },
+  {
+    title: "Selenium",
+    description: "Questions",
+    category: "Automation Testing",
+    kind: "Questions",
+    route: "/selenium-practice",
+  },
 ];
 
 const categories: ("All" | CategoryType)[] = [
@@ -120,6 +144,8 @@ const categories: ("All" | CategoryType)[] = [
   "React",
   "HTML/CSS",
   "Database",
+  "Selenium",
+  "Automation Testing",
 ];
 
 const categoryColors: Record<CategoryType, string> = {
@@ -129,6 +155,9 @@ const categoryColors: Record<CategoryType, string> = {
   "HTML/CSS": "#e65100",
   Database: "#6a1b9a",
   "Full Stack": "#0277bd",
+  Selenium: "#007396",
+  "Automation Testing": "#0277bd",
+  "API Testing": "#0277bd",
 };
 
 const kindIcons: Record<PostKind, ReactElement> = {

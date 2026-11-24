@@ -1263,7 +1263,17 @@ sys.stderr = sys.__stderr__
               mb: 1,
             }}
           >
-            <Box sx={{ flex: 1, display: { xs: "none", sm: "block" } }} />
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Tooltip title="Back to landing page">
+                <IconButton
+                  aria-label="Back to landing page"
+                  onClick={() => navigate("/")}
+                  size="small"
+                >
+                  <ArrowBackIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
 
             <Box sx={{ textAlign: "center", flex: 1, minWidth: 0 }}>
               <Typography
@@ -1576,7 +1586,7 @@ sys.stderr = sys.__stderr__
               })}
             </Grid>
 
-            <Button
+            {/* <Button
               onClick={() => navigate("/learning")}
               startIcon={<LightbulbIcon />}
               sx={{ mt: 1.5, color: "#26745a", fontWeight: 700 }}
@@ -1589,7 +1599,7 @@ sys.stderr = sys.__stderr__
               sx={{ mt: 1.5, color: "#26745a", fontWeight: 700 }}
             >
               Create Port Foilos
-            </Button>
+            </Button> */}
           </Box>
 
           {/* <LearningPosts /> */}

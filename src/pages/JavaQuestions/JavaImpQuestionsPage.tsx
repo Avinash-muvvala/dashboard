@@ -9,6 +9,11 @@ const pdfMap: Record<string, { label: string; file: string }> = {
     file: "/pdfs/DesginPatterns.pdf",
   },
   SpringBoot: { label: "Spring / Spring Boot", file: "/pdfs/SpringBoot.pdf" },
+  SpringBootGuide: {
+    label: "Spring / Spring Boot Guide",
+    file: "/pdfs/SpringBootGuide.pdf",
+  },
+
   Multithreading: {
     label: "Multithreading",
     file: "/pdfs/Multithreading_Questions.pdf",
@@ -28,6 +33,10 @@ const pdfMap: Record<string, { label: string; file: string }> = {
   Debugging: {
     label: "Debugging",
     file: "/pdfs/debugging.pdf",
+  },
+  SystemDesign: {
+    label: "System Design",
+    file: "/pdfs/SystemDesgin.pdf",
   },
 };
 const JavaImpQuestionsPage = () => {

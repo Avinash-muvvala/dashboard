@@ -488,7 +488,7 @@ const ReactDeveloperRoadmap = () => {
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/Dashboard")}
+            onClick={() => navigate("/learning")}
             sx={{ textTransform: "none" }}
           >
             Back

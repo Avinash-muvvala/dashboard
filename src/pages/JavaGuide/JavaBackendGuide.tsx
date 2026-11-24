@@ -15,6 +15,8 @@ import {
   Collapse,
   IconButton,
   Tooltip,
+  MenuItem,
+  Select,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -30,12 +32,13 @@ import { useNavigate } from "react-router-dom";
 
 const phases = [
   {
-    phase: "1A",
+    phase: "A",
     topic: "Java Fundamentals - Part 1",
     weeks: "Week 1",
+    plan: { 12: "Week 1", 24: "Week 1" },
     color: "#556FFF",
     topics: [
-     "Variables and Data Types",
+      "Variables and Data Types",
       "Primitive vs Reference Types",
       "Operators and Expressions",
       "Type Casting",
@@ -46,12 +49,13 @@ const phases = [
     ],
   },
   {
-    phase: "1B",
+    phase: "B",
     topic: "Java Fundamentals - Part 2",
     weeks: "Week 2",
+    plan: { 12: "Week 1", 24: "Week 2" },
     color: "#4A60E6",
     topics: [
-        "Strings",
+      "Strings",
       "StringBuilder",
       "StringBuffer",
       "Enums",
@@ -63,9 +67,10 @@ const phases = [
     ],
   },
   {
-    phase: "1C",
+    phase: "C",
     topic: "Object-Oriented Programming - Part 1",
     weeks: "Week 3",
+    plan: { 12: "Week 2", 24: "Week 3" },
     color: "#3F51CC",
     topics: [
       "Classes and Objects",
@@ -79,9 +84,10 @@ const phases = [
     ],
   },
   {
-    phase: "1D",
+    phase: "D",
     topic: "Object-Oriented Programming - Part 2",
     weeks: "Week 4",
+    plan: { 12: "Week 2", 24: "Week 4" },
     color: "#3442B3",
     topics: [
       "Inheritance",
@@ -94,10 +100,11 @@ const phases = [
       "equals(), hashCode(), toString()",
     ],
   },
-    {
-    phase: "1E",
+  {
+    phase: "E",
     topic: "Collections Framework - Part 1",
     weeks: "Week 5",
+    plan: { 12: "Week 3", 24: "Week 5" },
     color: "#3442B3",
     topics: [
       "Generics",
@@ -110,13 +117,14 @@ const phases = [
       "TreeSet",
     ],
   },
-    {
-    phase: "1F",
+  {
+    phase: "F",
     topic: "Collections Framework - Part 2",
     weeks: "Week 6",
+    plan: { 12: "Week 3", 24: "Week 6" },
     color: "#3442B3",
     topics: [
-        "Map Interface",
+      "Map Interface",
       "HashMap",
       "TreeMap",
       "HashMap Internals",
@@ -127,10 +135,11 @@ const phases = [
       "ConcurrentHashMap",
     ],
   },
-    {
-    phase: "1G",
+  {
+    phase: "G",
     topic: "Exception Handling & JVM",
     weeks: "Week 7",
+    plan: { 12: "Week 4", 24: "Week 7" },
     color: "#3442B3",
     topics: [
       "Exception Handling",
@@ -143,13 +152,14 @@ const phases = [
       "Garbage Collection",
     ],
   },
-    {
-    phase: "1H",
+  {
+    phase: "H",
     topic: "Object-Oriented Programming - Part 2",
     weeks: "Week 8",
+    plan: { 12: "Week 4", 24: "Week 8" },
     color: "#3442B3",
     topics: [
-       "Lambda Expressions",
+      "Lambda Expressions",
       "Functional Interfaces",
       "Method References",
       "Stream API",
@@ -160,9 +170,10 @@ const phases = [
     ],
   },
   {
-    phase: "2",
+    phase: "I",
     topic: "Dev Environment & Tools",
     weeks: "Week 9",
+    plan: { 12: "Week 5", 24: "Week 9" },
     color: "#7B61FF",
     topics: [
       "IntelliJ IDEA setup, essential navigation, and debugging shortcuts",
@@ -172,9 +183,10 @@ const phases = [
     ],
   },
   {
-    phase: "3",
+    phase: "J",
     topic: "Spring Core & Spring Boot",
     weeks: "Weeks 10",
+    plan: { 12: "Week 6", 24: "Weeks 10-11" },
     color: "#0EA5E9",
     topics: [
       "Inversion of Control (IoC) container and Dependency Injection (DI)",
@@ -184,9 +196,10 @@ const phases = [
     ],
   },
   {
-    phase: "4",
+    phase: "K",
     topic: "Building REST APIs",
     weeks: "Weeks 11",
+    plan: { 12: "Week 7", 24: "Weeks 12-13" },
     color: "#10B981",
     topics: [
       "RESTful principles, Controllers (@RestController), Routing, and Request Mappings",
@@ -196,9 +209,10 @@ const phases = [
     ],
   },
   {
-    phase: "5",
+    phase: "L",
     topic: "Data Persistence (Database Layer)",
     weeks: "Weeks 12",
+    plan: { 12: "Weeks 8-9", 24: "Weeks 14-16" },
     color: "#F59E0B",
     topics: [
       "Spring Data JPA, Hibernate ORM, and Mapping Entities (@Entity, @Id)",
@@ -209,9 +223,10 @@ const phases = [
     ],
   },
   {
-    phase: "6",
+    phase: "M",
     topic: "Spring Security & Auth",
     weeks: "Week 13",
+    plan: { 12: "Week 10", 24: "Weeks 17-18" },
     color: "#EF4444",
     topics: [
       "Architecture of the Spring Security Filter Chain",
@@ -221,9 +236,10 @@ const phases = [
     ],
   },
   {
-    phase: "7",
+    phase: "N",
     topic: "Testing & Production Deployment",
     weeks: "Weeks 14",
+    plan: { 12: "Weeks 11-12", 24: "Weeks 19-24" },
     color: "#8B5CF6",
     topics: [
       "Writing unit tests using JUnit 5 and mocking dependencies with Mockito",
@@ -261,9 +277,284 @@ const skillCards = [
   },
 ];
 
+type PlanLength = 12 | 24;
+
+const planOptions: { value: PlanLength; label: string }[] = [
+  { value: 12, label: "12 weeks" },
+  { value: 24, label: "24 weeks" },
+];
+
+const weeklySchedule: { week: number; title: string; topics: string[] }[] = [
+  {
+    week: 1,
+    title: "Java Variables and Types",
+    topics: [
+      "Variables",
+      "Primitive and reference types",
+      "Operators",
+      "Type casting",
+      "Wrapper classes",
+    ],
+  },
+  {
+    week: 2,
+    title: "Strings and Control Flow",
+    topics: [
+      "Strings",
+      "StringBuilder",
+      "StringBuffer",
+      "Enums",
+      "Conditions and loops",
+    ],
+  },
+  {
+    week: 3,
+    title: "Classes and Objects",
+    topics: [
+      "Classes",
+      "Constructors",
+      "Encapsulation",
+      "Static and final",
+      "Immutable objects",
+    ],
+  },
+  {
+    week: 4,
+    title: "Object-Oriented Design",
+    topics: [
+      "Inheritance",
+      "Composition",
+      "Polymorphism",
+      "Abstract classes",
+      "Interfaces",
+    ],
+  },
+  {
+    week: 5,
+    title: "Generics and Collections",
+    topics: [
+      "Generics",
+      "List",
+      "ArrayList",
+      "LinkedList",
+      "HashSet",
+      "TreeSet",
+    ],
+  },
+  {
+    week: 6,
+    title: "Maps and Queues",
+    topics: [
+      "HashMap",
+      "TreeMap",
+      "ConcurrentHashMap",
+      "Queue",
+      "Deque",
+      "Comparable",
+      "Comparator",
+    ],
+  },
+  {
+    week: 7,
+    title: "Exceptions and the JVM",
+    topics: [
+      "Exception hierarchy",
+      "Custom exceptions",
+      "Try-with-resources",
+      "JVM architecture",
+      "Garbage collection",
+    ],
+  },
+  {
+    week: 8,
+    title: "Modern Java and Concurrency",
+    topics: [
+      "Lambdas",
+      "Functional interfaces",
+      "Method references",
+      "Stream API",
+      "Threads and synchronization",
+    ],
+  },
+  {
+    week: 9,
+    title: "Developer Tooling",
+    topics: [
+      "IntelliJ",
+      "Maven or Gradle",
+      "Git and pull requests",
+      "Docker basics",
+      "PostgreSQL or MySQL",
+    ],
+  },
+  {
+    week: 10,
+    title: "Spring Core",
+    topics: [
+      "IoC",
+      "Dependency injection",
+      "Beans",
+      "Bean scopes",
+      "ApplicationContext",
+    ],
+  },
+  {
+    week: 11,
+    title: "Spring Boot Configuration",
+    topics: [
+      "Spring Boot starters",
+      "Auto-configuration",
+      "@SpringBootApplication",
+      "Profiles",
+      "Environment configuration",
+    ],
+  },
+  {
+    week: 12,
+    title: "REST API Fundamentals",
+    topics: [
+      "REST principles",
+      "Controllers",
+      "Routing",
+      "Request mappings",
+      "HTTP semantics",
+    ],
+  },
+  {
+    week: 13,
+    title: "Validation and Error Handling",
+    topics: [
+      "DTO pattern",
+      "Bean Validation",
+      "Controller advice",
+      "Exception handlers",
+      "OpenAPI",
+    ],
+  },
+  {
+    week: 14,
+    title: "JPA Entities",
+    topics: ["Spring Data JPA", "Hibernate", "@Entity", "@Id", "Repositories"],
+  },
+  {
+    week: 15,
+    title: "Entity Relationships",
+    topics: [
+      "One-to-many",
+      "Many-to-one",
+      "Many-to-many",
+      "Cascade",
+      "Fetch strategies",
+    ],
+  },
+  {
+    week: 16,
+    title: "Queries and Migrations",
+    topics: [
+      "Derived queries",
+      "JPQL",
+      "Native queries",
+      "Flyway",
+      "Liquibase",
+      "N+1 problems",
+    ],
+  },
+  {
+    week: 17,
+    title: "Spring Security Foundations",
+    topics: [
+      "Filter chain",
+      "Security configuration",
+      "Password encoding",
+      "Authentication",
+      "Authorization",
+    ],
+  },
+  {
+    week: 18,
+    title: "JWT and OAuth2",
+    topics: [
+      "JWT flow",
+      "Access tokens",
+      "Refresh tokens",
+      "RBAC",
+      "@PreAuthorize",
+      "OAuth2 concepts",
+    ],
+  },
+  {
+    week: 19,
+    title: "Unit Testing",
+    topics: [
+      "JUnit 5",
+      "Mockito",
+      "Test fixtures",
+      "Assertions",
+      "Dependency mocking",
+    ],
+  },
+  {
+    week: 20,
+    title: "Integration Testing",
+    topics: [
+      "Spring Boot tests",
+      "Testcontainers",
+      "Database tests",
+      "API integration tests",
+      "Test slices",
+    ],
+  },
+  {
+    week: 21,
+    title: "Containerization",
+    topics: [
+      "Dockerfiles",
+      "Multi-stage builds",
+      "Docker Compose",
+      "Container networking",
+      "Application configuration",
+    ],
+  },
+  {
+    week: 22,
+    title: "CI/CD and Deployment",
+    topics: [
+      "GitHub Actions",
+      "Build and test pipelines",
+      "Docker images",
+      "Environment secrets",
+      "Deployment basics",
+    ],
+  },
+  {
+    week: 23,
+    title: "Production Readiness",
+    topics: [
+      "Actuator",
+      "Logging",
+      "Metrics",
+      "Health checks",
+      "Caching",
+      "Graceful error handling",
+    ],
+  },
+  {
+    week: 24,
+    title: "Capstone and Portfolio",
+    topics: [
+      "Build a complete REST service",
+      "Add authentication",
+      "Write tests",
+      "Dockerize and deploy",
+      "Document the architecture",
+    ],
+  },
+];
+
 const JavaBackendGuide = () => {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
+  const [plan, setPlan] = useState<PlanLength>(24);
 
   const toggleExpand = (phase: string) =>
     setExpanded((prev) => (prev === phase ? null : phase));
@@ -343,7 +634,7 @@ const JavaBackendGuide = () => {
             <Button
               variant="outlined"
               startIcon={<ArrowBackIcon />}
-              onClick={() => navigate("/Dashboard")}
+              onClick={() => navigate("/learning")}
               sx={{
                 borderRadius: "10px",
                 textTransform: "none",
@@ -381,7 +672,7 @@ const JavaBackendGuide = () => {
         {/* Stats Row */}
         <Grid container spacing={2} sx={{ mb: 4 }}>
           {[
-            { label: "Total weeks", value: "12" },
+            { label: "Total weeks", value: String(plan) },
             { label: "Phases", value: phases.length },
             { label: "Phases done", value: completed.size },
             { label: "Progress", value: `${progress}%` },
@@ -444,6 +735,79 @@ const JavaBackendGuide = () => {
         </Box>
 
         <Divider sx={{ mb: 4, borderColor: "rgba(15,23,42,0.08)" }} />
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 2,
+            flexWrap: "wrap",
+            mb: 3,
+          }}
+        >
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>
+              Choose your pace
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              The same Java backend roadmap adapts to your available study time.
+            </Typography>
+          </Box>
+          <Select
+            size="small"
+            value={plan}
+            onChange={(event) =>
+              setPlan(Number(event.target.value) as PlanLength)
+            }
+          >
+            {planOptions.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+
+        {plan === 24 && (
+          <Box
+            sx={{
+              mb: 4,
+              p: 2.5,
+              borderRadius: 3,
+              border: "1px solid rgba(85,111,255,0.12)",
+              backgroundColor: "rgba(85,111,255,0.025)",
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{ fontWeight: 800, color: "#556FFF" }}
+            >
+              24-WEEK LEARNING SCHEDULE
+            </Typography>
+            <Grid container spacing={1} sx={{ mt: 0.5 }}>
+              {weeklySchedule.map((week) => (
+                <Grid key={week.week} size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Box
+                    sx={{
+                      height: "100%",
+                      py: 1,
+                      pl: 1.25,
+                      borderLeft: "3px solid rgba(85,111,255,0.35)",
+                    }}
+                  >
+                    <Typography variant="body2" sx={{ fontWeight: 800 }}>
+                      Week {week.week}: {week.title}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {week.topics.join(" • ")}
+                    </Typography>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
 
         {/* Info Cards */}
         <Grid container spacing={2} sx={{ mb: 4 }}>
@@ -591,7 +955,7 @@ const JavaBackendGuide = () => {
                           {r.topic}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          {r.topics.length} Topics • {r.weeks}
+                          {r.topics.length} Topics • {r.plan[plan]}
                         </Typography>
                       </Box>
 

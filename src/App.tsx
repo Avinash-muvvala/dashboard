@@ -9,6 +9,9 @@ import { auth } from "./pages/SERVER/firebaseConfig";
 
 const AuthPage = lazy(() => import("./pages/SERVER/AuthPage"));
 const Dashboard = lazy(() => import("./pages/dashboard"));
+const WelcomePage = lazy(() => import("./pages/WelcomePage"));
+const AssessmentPage = lazy(() => import("./pages/AssessmentPage"));
+const ResumeBuilderPage = lazy(() => import("./pages/ResumeBuilderPage"));
 const UserProfilePage = lazy(() => import("./pages/SERVER/UserProfilePage"));
 const JavaImpTopicsPage = lazy(
   () => import("./pages/JavaQuestions/JavaImpTopics"),
@@ -77,7 +80,31 @@ const App = () => (
           path="/"
           element={
             <ProtectedRoute>
+              <WelcomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/practice"
+          element={
+            <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/assessment"
+          element={
+            <ProtectedRoute>
+              <AssessmentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/resume-builder"
+          element={
+            <ProtectedRoute>
+              <ResumeBuilderPage />
             </ProtectedRoute>
           }
         />

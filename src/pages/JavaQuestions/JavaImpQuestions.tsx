@@ -47,6 +47,19 @@ const topics = [
     route: "/JavaImpQuestionsPage/SpringBoot",
   },
   {
+    title: "Spring / Spring Boot Guide",
+    subtitle: "Framework & Auto-config",
+    description: "Complete guide for fresher to exp candidate need to know ",
+    tags: ["Spring Core", "Auto-config", "Actuator", "Security"],
+    icon: (
+      <SettingsInputComponentIcon sx={{ fontSize: 20, color: "#22c55e" }} />
+    ),
+    iconBg: "rgba(34, 197, 94, 0.08)",
+    tagBg: "rgba(34, 197, 94, 0.06)",
+    tagColor: "#4ade80",
+    route: "/JavaImpQuestionsPage/SpringBootGuide",
+  },
+  {
     title: "MultiThreading",
     subtitle: "Concurrency & Parallelism",
     description:
